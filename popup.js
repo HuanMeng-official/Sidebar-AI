@@ -2,94 +2,60 @@ document.addEventListener('DOMContentLoaded', function() {
   const apiEndpointInput = document.getElementById('apiEndpoint');
   const apiKeyInput = document.getElementById('apiKey');
   const modelInput = document.getElementById('model');
-  const temperatureInput = document.getElementById('temperature');
-  const maxTokensInput = document.getElementById('maxTokens');
   const saveBtn = document.getElementById('saveBtn');
   const testBtn = document.getElementById('testBtn');
   const openSidebarBtn = document.getElementById('openSidebar');
   const openNewTabBtn = document.getElementById('openNewTab');
   const statusDiv = document.getElementById('status');
 
-  // 加载保存的设置
+  // Load saved settings
   chrome.storage.sync.get([
     'apiEndpoint', 
     'apiKey', 
-    'model', 
-    'temperature', 
-    'maxTokens'
+    'model'
   ], function(result) {
-    if (result.apiEndpoint) {
-      apiEndpointInput.value = result.apiEndpoint;
-    } else {
-      apiEndpointInput.value = 'https://api.openai.com/v1/chat/completions';
-    }
-    
-    if (result.apiKey) {
-      apiKeyInput.value = result.apiKey;
-    }
-    
-    if (result.model) {
-      modelInput.value = result.model;
-    } else {
-      modelInput.value = 'gpt-3.5-turbo';
-    }
-    
-    if (result.temperature !== undefined) {
-      temperatureInput.value = result.temperature;
-    }
-    
-    if (result.maxTokens !== undefined) {
-      maxTokensInput.value = result.maxTokens;
-    }
+    apiEndpointInput.value = result.apiEndpoint || 'https://api.openai.com/v1/chat/completions';
+    apiKeyInput.value = result.apiKey || '';
+    modelInput.value = result.model || 'gpt-3.5-turbo';
   });
 
-  // 保存设置
+  // Save settings
   saveBtn.addEventListener('click', function() {
     const apiEndpoint = apiEndpointInput.value.trim();
     const apiKey = apiKeyInput.value.trim();
     const model = modelInput.value.trim();
-    const temperature = parseFloat(temperatureInput.value);
-    const maxTokens = parseInt(maxTokensInput.value);
     
-    if (!apiEndpoint) {
-      showStatus('请输入API端点', 'error');
-      return;
-    }
-    
-    if (!model) {
-      showStatus('请输入模型名称', 'error');
+    if (!apiEndpoint || !model) {
+      showStatus('Please fill in required fields', 'error');
       return;
     }
 
     chrome.storage.sync.set({
       apiEndpoint: apiEndpoint,
       apiKey: apiKey,
-      model: model,
-      temperature: temperature,
-      maxTokens: maxTokens
+      model: model
     }, function() {
-      showStatus('设置已保存！', 'success');
+      showStatus('Settings saved successfully!', 'success');
     });
   });
 
-  // 测试连接
+  // Test connection
   testBtn.addEventListener('click', async function() {
     const apiEndpoint = apiEndpointInput.value.trim();
     const apiKey = apiKeyInput.value.trim();
     const model = modelInput.value.trim();
     
     if (!apiEndpoint || !model) {
-      showStatus('请填写API端点和模型名称', 'error');
+      showStatus('Please fill in API endpoint and model', 'error');
       return;
     }
 
-    showStatus('测试连接中...', 'success');
+    showStatus('Testing connection...', 'success');
     testBtn.disabled = true;
 
     try {
-      // 发送测试请求
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(apiEndpoint, {
         method: 'POST',
@@ -108,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        showStatus('连接成功！', 'success');
+        showStatus('Connection successful!', 'success');
       } else {
         const errorText = await response.text();
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
@@ -124,40 +90,35 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     } catch (error) {
       if (error.name === 'AbortError') {
-        showStatus('测试超时，请检查网络连接', 'error');
+        showStatus('Test timeout, check network connection', 'error');
       } else {
-        showStatus(`测试失败: ${error.message}`, 'error');
+        showStatus(`Test failed: ${error.message}`, 'error');
       }
     } finally {
       testBtn.disabled = false;
     }
   });
 
-  // 打开侧边栏 - 修复窗口ID问题
+  // Open sidebar
   openSidebarBtn.addEventListener('click', async function() {
     try {
-      // Chrome 114+ 使用 sidePanel API
       if (chrome.sidePanel) {
-        // 首先获取当前窗口ID
         const currentWindow = await chrome.windows.getCurrent();
         await chrome.sidePanel.open({windowId: currentWindow.id});
-        showStatus('侧边栏已打开', 'success');
+        showStatus('Sidebar opened', 'success');
       } else {
-        // 兼容旧版本 - 提示用户
-        showStatus('您的Chrome版本不支持侧边栏功能，请升级到最新版本', 'error');
+        showStatus('Your Chrome version does not support sidebar', 'error');
       }
     } catch (error) {
-      console.error('打开侧边栏失败:', error);
-      // 提供备选方案
-      showStatus('打开侧边栏失败，将在新标签页中打开', 'error');
-      // 延迟执行以显示错误信息
+      console.error('Open sidebar failed:', error);
+      showStatus('Opening in new tab instead', 'error');
       setTimeout(() => {
         chrome.tabs.create({url: chrome.runtime.getURL('sidebar.html')});
       }, 1000);
     }
   });
 
-  // 在新标签页中打开
+  // Open in new tab
   openNewTabBtn.addEventListener('click', function() {
     chrome.tabs.create({url: chrome.runtime.getURL('sidebar.html')});
   });

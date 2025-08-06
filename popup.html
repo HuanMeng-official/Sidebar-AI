@@ -9,50 +9,53 @@
 <body>
   <div class="container">
     <div class="header">
-      <h2>Sidebar AI</h2>
-      <p>配置您的AI服务</p>
+      <h1>Sidebar AI Settings</h1>
     </div>
     
     <div class="form-group">
-      <label for="apiEndpoint">API端点</label>
-      <input type="url" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
-      <div class="helper-text">支持任何兼容OpenAI API的端点</div>
+      <label for="apiEndpoint">API Endpoint</label>
+      <input type="url" id="apiEndpoint" class="winui-input" placeholder="https://api.openai.com/v1/chat/completions">
     </div>
     
     <div class="form-group">
-      <label for="apiKey">API密钥</label>
-      <input type="password" id="apiKey" placeholder="输入API密钥">
+      <label for="apiKey">API Key</label>
+      <input type="password" id="apiKey" class="winui-input" placeholder="Enter your API key">
     </div>
     
     <div class="form-group">
-      <label for="model">模型名称</label>
-      <input type="text" id="model" placeholder="gpt-3.5-turbo">
-      <div class="helper-text">根据API提供商填写对应的模型名称</div>
+      <label for="model">Model</label>
+      <input type="text" id="model" class="winui-input" placeholder="gpt-3.5-turbo">
     </div>
     
-    <div class="advanced-settings">
-      <div class="setting-item">
-        <label for="temperature">温度 (0-2)</label>
-        <input type="number" id="temperature" min="0" max="2" step="0.1" value="0.7">
-      </div>
-      
-      <div class="setting-item">
-        <label for="maxTokens">最大令牌数</label>
-        <input type="number" id="maxTokens" min="1" max="4096" value="1000">
-      </div>
+    <div class="button-group">
+      <button id="saveBtn" class="winui-button primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="icon-save">
+          <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"/>
+        </svg>
+        <span>Save Settings</span>
+      </button>
+      <button id="testBtn" class="winui-button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="icon-test">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+        </svg>
+        <span>Test Connection</span>
+      </button>
     </div>
-    
-    <button id="saveBtn" class="save-btn">保存设置</button>
-    <button id="testBtn" class="test-btn">测试连接</button>
     
     <div class="status" id="status"></div>
     
     <div class="actions">
-      <button id="openSidebar" class="sidebar-btn">
-        打开侧边栏
+      <button id="openSidebar" class="winui-button accent">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="icon-sidebar">
+          <path d="M21 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM9 18H5V6h4v12zm10 0h-8V6h8v12z" fill="currentColor"/>
+        </svg>
+        <span>Open Sidebar</span>
       </button>
-      <button id="openNewTab" class="new-tab-btn">
-        在新标签页中打开
+      <button id="openNewTab" class="winui-button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="icon-tab">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H5v-4h10v4zm0-5H5V9h10v4zm5 5h-4V9h4v9z" fill="currentColor"/>
+        </svg>
+        <span>Open in New Tab</span>
       </button>
     </div>
   </div>

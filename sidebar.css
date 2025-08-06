@@ -1,34 +1,58 @@
 :root {
-  --primary: #6750A4;
-  --on-primary: #FFFFFF;
-  --primary-container: #EADDFF;
-  --on-primary-container: #21005D;
-  --secondary: #625B71;
-  --on-secondary: #FFFFFF;
-  --secondary-container: #E8DEF8;
-  --on-secondary-container: #1D192B;
-  --tertiary: #7D5260;
-  --on-tertiary: #FFFFFF;
-  --tertiary-container: #FFD8E4;
-  --on-tertiary-container: #31111D;
-  --surface: #FFFBFE;
-  --on-surface: #1C1B1F;
-  --surface-variant: #E7E0EC;
-  --on-surface-variant: #49454F;
-  --outline: #79747E;
-  --outline-variant: #CAC4D0;
-  --shadow: #000000;
-  --scrim: #000000;
-  --inverse-surface: #313033;
-  --inverse-on-surface: #F4EFF4;
-  --inverse-primary: #D0BCFF;
-  --surface-dim: #DDD8DD;
-  --surface-bright: #FFFBFE;
-  --surface-container-lowest: #FFFFFF;
-  --surface-container-low: #F7F2F7;
-  --surface-container: #F3EDF3;
-  --surface-container-high: #ECE6EB;
-  --surface-container-highest: #E6E0E5;
+  /* 浅色主题 */
+  --accent-color: #0078d4;
+  --accent-hover: #106ebe;
+  --accent-pressed: #005a9e;
+  --accent-disabled: #cccccc;
+  
+  --background-color: #ffffff;
+  --surface-color: #f3f3f3;
+  --card-color: #ffffff;
+  
+  --text-primary: #000000;
+  --text-secondary: #616161;
+  --text-disabled: #a1a1a1;
+  
+  --border-color: #e0e0e0;
+  --border-hover: #8a8a8a;
+  
+  --success-color: #107c10;
+  --error-color: #a80000;
+  --warning-color: #797775;
+  
+  --shadow-1: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-2: 0 4px 8px rgba(0, 0, 0, 0.15);
+  
+  --border-radius: 4px;
+  --transition: all 0.1s ease;
+}
+
+/* 暗色主题 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent-color: #4cc2ff;
+    --accent-hover: #5cb3ff;
+    --accent-pressed: #3da8e0;
+    --accent-disabled: #555555;
+    
+    --background-color: #202020;
+    --surface-color: #2c2c2c;
+    --card-color: #1e1e1e;
+    
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-disabled: #666666;
+    
+    --border-color: #404040;
+    --border-hover: #707070;
+    
+    --success-color: #47c247;
+    --error-color: #ff6666;
+    --warning-color: #aaaaaa;
+    
+    --shadow-1: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-2: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
 }
 
 * {
@@ -38,11 +62,13 @@
 }
 
 body {
-  font-family: 'Roboto', 'Segoe UI', sans-serif;
-  background-color: var(--surface);
-  color: var(--on-surface);
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'San Francisco', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
   height: 100vh;
   overflow: hidden;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .sidebar-container {
@@ -53,19 +79,23 @@ body {
 }
 
 .header {
+  background-color: var(--card-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+
+.header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background-color: var(--primary);
-  color: var(--on-primary);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
 }
 
 .header h1 {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: inherit;
 }
 
 .header-actions {
@@ -73,23 +103,64 @@ body {
   gap: 8px;
 }
 
-.settings-btn,
-.clear-btn {
-  background: transparent;
-  border: none;
-  color: var(--on-primary);
+.winui-button {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--card-color);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-  display: flex;
+  transition: var(--transition);
+  min-height: 32px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-family: inherit;
 }
 
-.settings-btn:hover,
-.clear-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.winui-button:hover:not(:disabled) {
+  background-color: var(--surface-color);
+  border-color: var(--border-hover);
+}
+
+.winui-button:active:not(:disabled) {
+  background-color: var(--surface-color);
+  opacity: 0.8;
+}
+
+.winui-button:disabled {
+  color: var(--text-disabled);
+  background-color: var(--surface-color);
+  border-color: var(--border-color);
+  cursor: not-allowed;
+}
+
+.winui-button.icon {
+  padding: 8px;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.winui-button.primary {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.winui-button.primary:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.winui-button.primary:active:not(:disabled) {
+  background-color: var(--accent-pressed);
+  border-color: var(--accent-pressed);
+}
+
+.winui-button.primary .icon-send {
+  color: white;
 }
 
 .chat-container {
@@ -103,25 +174,27 @@ body {
 .welcome-message {
   text-align: center;
   padding: 32px 16px;
-  color: var(--on-surface-variant);
+  color: var(--text-secondary);
 }
 
 .welcome-icon {
   margin-bottom: 16px;
-  color: var(--primary);
+  color: var(--accent-color);
 }
 
 .welcome-message h2 {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
   margin-bottom: 8px;
-  color: var(--on-surface);
+  color: var(--text-primary);
+  font-family: inherit;
 }
 
 .welcome-message p {
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 16px;
+  font-family: inherit;
 }
 
 .supported-providers {
@@ -133,48 +206,56 @@ body {
 }
 
 .provider-tag {
-  background-color: var(--primary-container);
-  color: var(--on-primary-container);
+  background-color: var(--surface-color);
+  color: var(--text-primary);
   padding: 4px 12px;
   border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
+  font-family: inherit;
 }
 
 .message {
   max-width: 85%;
   padding: 12px 16px;
   margin-bottom: 16px;
-  border-radius: 18px;
+  border-radius: var(--border-radius);
   line-height: 1.5;
   position: relative;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.2s ease;
   word-wrap: break-word;
+  box-shadow: var(--shadow-1);
+  font-family: inherit;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .user-message {
   align-self: flex-end;
-  background-color: var(--primary);
-  color: var(--on-primary);
-  border-bottom-right-radius: 4px;
+  background-color: var(--accent-color);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.user-message .icon-send {
+  color: white;
 }
 
 .ai-message {
   align-self: flex-start;
-  background-color: var(--surface-container);
-  color: var(--on-surface);
-  border-bottom-left-radius: 4px;
+  background-color: var(--card-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-bottom-left-radius: 2px;
 }
 
 .input-container {
   padding: 16px;
-  background-color: var(--surface);
-  border-top: 1px solid var(--outline-variant);
+  background-color: var(--card-color);
+  border-top: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
@@ -184,49 +265,36 @@ body {
   align-items: flex-end;
 }
 
-#messageInput {
+.winui-textarea {
   flex: 1;
-  padding: 12px 16px;
-  border: 1px solid var(--outline);
-  border-radius: 24px;
-  background-color: var(--surface-container);
-  color: var(--on-surface);
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--card-color);
+  color: var(--text-primary);
   font-size: 14px;
   resize: none;
-  min-height: 48px;
+  min-height: 36px;
   max-height: 120px;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: var(--transition);
+  font-family: inherit;
+  line-height: 1.4;
 }
 
-#messageInput:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px var(--primary-container);
+.winui-textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3);
 }
 
-.send-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: var(--primary);
-  color: var(--on-primary);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-  flex-shrink: 0;
+.winui-textarea:hover:not(:focus) {
+  border-color: var(--border-hover);
 }
 
-.send-btn:hover:not(:disabled) {
-  background-color: #5a4794;
-}
-
-.send-btn:disabled {
-  background-color: var(--surface-variant);
-  color: var(--on-surface-variant);
-  cursor: not-allowed;
+/* 确保文本域使用系统字体 */
+.winui-textarea::-webkit-input-placeholder {
+  font-family: inherit;
+  color: var(--text-secondary);
 }
 
 .loading {
@@ -243,7 +311,7 @@ body {
 .loading-dots div {
   width: 8px;
   height: 8px;
-  background-color: var(--primary);
+  background-color: var(--accent-color);
   border-radius: 50%;
   animation: bounce 1.4s infinite ease-in-out both;
 }
@@ -265,26 +333,25 @@ body {
   }
 }
 
-/* 滚动条样式 */
+/* Scrollbar */
 .chat-container::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .chat-container::-webkit-scrollbar-track {
-  background: var(--surface-container);
-  border-radius: 3px;
+  background: var(--surface-color);
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-  background: var(--outline-variant);
-  border-radius: 3px;
+  background: var(--border-color);
+  border-radius: 4px;
 }
 
 .chat-container::-webkit-scrollbar-thumb:hover {
-  background: var(--outline);
+  background: var(--border-hover);
 }
 
-/* 响应式设计 */
+/* Responsive */
 @media (max-width: 400px) {
   .message {
     max-width: 90%;

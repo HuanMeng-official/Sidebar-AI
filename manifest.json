@@ -2,11 +2,12 @@
   "manifest_version": 3,
   "name": "Sidebar AI",
   "version": "1.0",
-  "description": "通用AI助手侧边栏",
+  "description": "侧边栏AI助手",
   "permissions": [
     "activeTab",
     "storage",
-    "sidePanel"
+    "sidePanel",
+    "windows"
   ],
   "host_permissions": [
     "<all_urls>"
