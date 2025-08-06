@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Sidebar AI",
+  "name": "__MSG_extensionName__",
   "version": "1.0",
-  "description": "侧边栏AI助手",
+  "description": "__MSG_extensionDescription__",
   "permissions": [
     "activeTab",
     "storage",
@@ -27,5 +27,6 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "default_locale": "en"
 }

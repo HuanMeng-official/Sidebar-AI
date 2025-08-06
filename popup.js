@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+  document.getElementById('settingsTitle').textContent = chrome.i18n.getMessage('settingsTitle');
+  document.getElementById('apiEndpointLabel').textContent = chrome.i18n.getMessage('apiEndpoint');
+  document.getElementById('apiKeyLabel').textContent = chrome.i18n.getMessage('apiKey');
+  document.getElementById('modelLabel').textContent = chrome.i18n.getMessage('model');
+  document.getElementById('saveSettingsText').textContent = chrome.i18n.getMessage('saveSettings');
+  document.getElementById('testConnectionText').textContent = chrome.i18n.getMessage('testConnection');
+  document.getElementById('openSidebarText').textContent = chrome.i18n.getMessage('openSidebar');
+  document.getElementById('openNewTabText').textContent = chrome.i18n.getMessage('openNewTab');
+  
+  document.getElementById('apiEndpoint').placeholder = chrome.i18n.getMessage('enterApiEndpoint');
+  document.getElementById('apiKey').placeholder = chrome.i18n.getMessage('enterApiKey');
+  document.getElementById('model').placeholder = chrome.i18n.getMessage('enterModel');
+
   const apiEndpointInput = document.getElementById('apiEndpoint');
   const apiKeyInput = document.getElementById('apiKey');
   const modelInput = document.getElementById('model');
@@ -8,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const openNewTabBtn = document.getElementById('openNewTab');
   const statusDiv = document.getElementById('status');
 
-  // Load saved settings
   chrome.storage.sync.get([
     'apiEndpoint', 
     'apiKey', 
@@ -19,14 +32,13 @@ document.addEventListener('DOMContentLoaded', function() {
     modelInput.value = result.model || 'gpt-3.5-turbo';
   });
 
-  // Save settings
   saveBtn.addEventListener('click', function() {
     const apiEndpoint = apiEndpointInput.value.trim();
     const apiKey = apiKeyInput.value.trim();
     const model = modelInput.value.trim();
     
     if (!apiEndpoint || !model) {
-      showStatus('Please fill in required fields', 'error');
+      showStatus(chrome.i18n.getMessage('fillRequiredFields'), 'error');
       return;
     }
 
@@ -35,22 +47,21 @@ document.addEventListener('DOMContentLoaded', function() {
       apiKey: apiKey,
       model: model
     }, function() {
-      showStatus('Settings saved successfully!', 'success');
+      showStatus(chrome.i18n.getMessage('settingsSaved'), 'success');
     });
   });
 
-  // Test connection
   testBtn.addEventListener('click', async function() {
     const apiEndpoint = apiEndpointInput.value.trim();
     const apiKey = apiKeyInput.value.trim();
     const model = modelInput.value.trim();
     
     if (!apiEndpoint || !model) {
-      showStatus('Please fill in API endpoint and model', 'error');
+      showStatus(chrome.i18n.getMessage('fillRequiredFields'), 'error');
       return;
     }
 
-    showStatus('Testing connection...', 'success');
+    showStatus(chrome.i18n.getMessage('testingConnection'), 'success');
     testBtn.disabled = true;
 
     try {
@@ -74,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        showStatus('Connection successful!', 'success');
+        showStatus(chrome.i18n.getMessage('connectionSuccessful'), 'success');
       } else {
         const errorText = await response.text();
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
@@ -90,35 +101,33 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     } catch (error) {
       if (error.name === 'AbortError') {
-        showStatus('Test timeout, check network connection', 'error');
+        showStatus(chrome.i18n.getMessage('testTimeout'), 'error');
       } else {
-        showStatus(`Test failed: ${error.message}`, 'error');
+        showStatus(chrome.i18n.getMessage('testFailed', [error.message]), 'error');
       }
     } finally {
       testBtn.disabled = false;
     }
   });
 
-  // Open sidebar
   openSidebarBtn.addEventListener('click', async function() {
     try {
       if (chrome.sidePanel) {
         const currentWindow = await chrome.windows.getCurrent();
         await chrome.sidePanel.open({windowId: currentWindow.id});
-        showStatus('Sidebar opened', 'success');
+        showStatus(chrome.i18n.getMessage('sidebarOpened'), 'success');
       } else {
-        showStatus('Your Chrome version does not support sidebar', 'error');
+        showStatus(chrome.i18n.getMessage('sidebarNotSupported'), 'error');
       }
     } catch (error) {
       console.error('Open sidebar failed:', error);
-      showStatus('Opening in new tab instead', 'error');
+      showStatus(chrome.i18n.getMessage('openingInNewTab'), 'error');
       setTimeout(() => {
         chrome.tabs.create({url: chrome.runtime.getURL('sidebar.html')});
       }, 1000);
     }
   });
 
-  // Open in new tab
   openNewTabBtn.addEventListener('click', function() {
     chrome.tabs.create({url: chrome.runtime.getURL('sidebar.html')});
   });

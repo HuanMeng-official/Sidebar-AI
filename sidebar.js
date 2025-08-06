@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+  document.getElementById('settingsBtn').title = chrome.i18n.getMessage('settings');
+  document.getElementById('clearBtn').title = chrome.i18n.getMessage('clearChat');
+  document.getElementById('welcomeTitle').textContent = chrome.i18n.getMessage('welcomeTitle');
+  document.getElementById('welcomeMessage').textContent = chrome.i18n.getMessage('welcomeMessage');
+  document.getElementById('messageInput').placeholder = chrome.i18n.getMessage('typeMessage');
+  
+  document.getElementById('openaiTag').textContent = chrome.i18n.getMessage('openai');
+  document.getElementById('azureTag').textContent = chrome.i18n.getMessage('azure');
+  document.getElementById('claudeTag').textContent = chrome.i18n.getMessage('claude');
+  document.getElementById('localTag').textContent = chrome.i18n.getMessage('local');
+
   const chatContainer = document.getElementById('chatContainer');
   const messageInput = document.getElementById('messageInput');
   const sendBtn = document.getElementById('sendBtn');
@@ -8,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   let conversationHistory = [];
 
-  // Auto-resize textarea
   messageInput.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
@@ -19,12 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Enable/disable send button
   messageInput.addEventListener('input', function() {
     sendBtn.disabled = !this.value.trim();
   });
 
-  // Send message (Enter key)
   messageInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -34,18 +43,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Send button click
   sendBtn.addEventListener('click', sendMessage);
 
-  // Clear chat
   clearBtn.addEventListener('click', function() {
     showWelcomeMessage();
     conversationHistory = [];
   });
 
-  // Open settings - 弹出设置窗口
   settingsBtn.addEventListener('click', function() {
-    // 创建弹出窗口显示设置页面
     chrome.windows.create({
       url: chrome.runtime.getURL('popup.html'),
       type: 'popup',
@@ -55,22 +60,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Show welcome message
   function showWelcomeMessage() {
     chatContainer.innerHTML = `
       <div class="welcome-message">
         <div class="welcome-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="icon-robot">
-            <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5L3 3V5H5V7H3V9H5V11H3V15H5V17H3V19H5V21H9V19H15V21H19V19H21V15H19V11H21V9H19V7H21V9ZM17 17H7V15H17V17ZM17 13H7V11H17V13ZM17 9H7V7H17V9Z" fill="currentColor"/>
+            <path d="M9 11H15V13H9V11ZM12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H9L3 7V9H5V21H19V9H21ZM7 20V9H9V20H7ZM17 20V9H15V20H17Z" fill="currentColor"/>
           </svg>
         </div>
-        <h2>Welcome to AI Assistant</h2>
-        <p>Ask me anything and I'll help you</p>
+        <h2>${chrome.i18n.getMessage('welcomeTitle')}</h2>
+        <p>${chrome.i18n.getMessage('welcomeMessage')}</p>
         <div class="supported-providers">
-          <span class="provider-tag">OpenAI</span>
-          <span class="provider-tag">Azure</span>
-          <span class="provider-tag">Claude</span>
-          <span class="provider-tag">Local</span>
+          <span class="provider-tag">${chrome.i18n.getMessage('openai')}</span>
+          <span class="provider-tag">${chrome.i18n.getMessage('azure')}</span>
+          <span class="provider-tag">${chrome.i18n.getMessage('claude')}</span>
+          <span class="provider-tag">${chrome.i18n.getMessage('local')}</span>
         </div>
       </div>
     `;
@@ -99,11 +103,11 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       if (!config.apiEndpoint) {
-        throw new Error('Please configure API endpoint in settings');
+        throw new Error(chrome.i18n.getMessage('pleaseConfigureApi'));
       }
 
       if (!config.model) {
-        throw new Error('Please configure model in settings');
+        throw new Error(chrome.i18n.getMessage('pleaseConfigureModel'));
       }
 
       conversationHistory.push({
@@ -126,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
     } catch (error) {
-      addMessageToChat(`Error: ${error.message}`, 'ai');
+      addMessageToChat(chrome.i18n.getMessage('errorMessage', [error.message]), 'ai');
     } finally {
       loading.style.display = 'none';
       chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -211,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (error) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        throw new Error('Request timeout, check network or API service');
+        throw new Error(chrome.i18n.getMessage('requestTimeout'));
       }
       throw error;
     }

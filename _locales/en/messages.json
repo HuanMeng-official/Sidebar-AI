@@ -1,0 +1,154 @@
+{
+    "extensionName": {
+      "message": "Sidebar AI",
+      "description": "Extension name"
+    },
+    "extensionDescription": {
+      "message": "Sidebar AI assistant",
+      "description": "Extension description"
+    },
+    "settingsTitle": {
+      "message": "Sidebar AI Settings",
+      "description": "Settings page title"
+    },
+    "apiEndpoint": {
+      "message": "API Endpoint",
+      "description": "API endpoint label"
+    },
+    "apiKey": {
+      "message": "API Key",
+      "description": "API key label"
+    },
+    "model": {
+      "message": "Model",
+      "description": "Model label"
+    },
+    "saveSettings": {
+      "message": "Save Settings",
+      "description": "Save settings button"
+    },
+    "testConnection": {
+      "message": "Test Connection",
+      "description": "Test connection button"
+    },
+    "openSidebar": {
+      "message": "Open Sidebar",
+      "description": "Open sidebar button"
+    },
+    "openNewTab": {
+      "message": "Open in New Tab",
+      "description": "Open in new tab button"
+    },
+    "enterApiEndpoint": {
+      "message": "Enter API endpoint",
+      "description": "API endpoint placeholder"
+    },
+    "enterApiKey": {
+      "message": "Enter your API key",
+      "description": "API key placeholder"
+    },
+    "enterModel": {
+      "message": "Enter model name",
+      "description": "Model placeholder"
+    },
+    "settingsSaved": {
+      "message": "Settings saved successfully!",
+      "description": "Settings saved success message"
+    },
+    "fillRequiredFields": {
+      "message": "Please fill in required fields",
+      "description": "Required fields error message"
+    },
+    "testingConnection": {
+      "message": "Testing connection...",
+      "description": "Testing connection message"
+    },
+    "connectionSuccessful": {
+      "message": "Connection successful!",
+      "description": "Connection successful message"
+    },
+    "testTimeout": {
+      "message": "Test timeout, check network connection",
+      "description": "Test timeout error message"
+    },
+    "testFailed": {
+      "message": "Test failed: $error$",
+      "description": "Test failed error message",
+      "placeholders": {
+        "error": {
+          "content": "$1",
+          "example": "Network error"
+        }
+      }
+    },
+    "sidebarOpened": {
+      "message": "Sidebar opened",
+      "description": "Sidebar opened message"
+    },
+    "sidebarNotSupported": {
+      "message": "Your Chrome version does not support sidebar",
+      "description": "Sidebar not supported message"
+    },
+    "openingInNewTab": {
+      "message": "Opening in new tab instead",
+      "description": "Opening in new tab message"
+    },
+    "welcomeTitle": {
+      "message": "Welcome to Sidebar AI",
+      "description": "Welcome message title"
+    },
+    "welcomeMessage": {
+      "message": "Ask me anything and I'll help you",
+      "description": "Welcome message text"
+    },
+    "clearChat": {
+      "message": "Clear Chat",
+      "description": "Clear chat button title"
+    },
+    "settings": {
+      "message": "Settings",
+      "description": "Settings button title"
+    },
+    "typeMessage": {
+      "message": "Type your message...",
+      "description": "Message input placeholder"
+    },
+    "openai": {
+      "message": "OpenAI",
+      "description": "OpenAI provider name"
+    },
+    "azure": {
+      "message": "Azure",
+      "description": "Azure provider name"
+    },
+    "claude": {
+      "message": "Claude",
+      "description": "Claude provider name"
+    },
+    "local": {
+      "message": "Local",
+      "description": "Local provider name"
+    },
+    "pleaseConfigureApi": {
+      "message": "Please configure API endpoint in settings",
+      "description": "API not configured error message"
+    },
+    "pleaseConfigureModel": {
+      "message": "Please configure model in settings",
+      "description": "Model not configured error message"
+    },
+    "errorMessage": {
+      "message": "Error: $error$",
+      "description": "Error message",
+      "placeholders": {
+        "error": {
+          "content": "$1",
+          "example": "Network error"
+        }
+      }
+    },
+    "requestTimeout": {
+      "message": "Request timeout, check network or API service",
+      "description": "Request timeout error message"
+    }
+  }
