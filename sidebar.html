@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sidebar AI</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div class="sidebar-container">
+    <div class="header">
+      <h1>Sidebar AI</h1>
+      <div class="header-actions">
+        <button id="settingsBtn" class="settings-btn" title="设置">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15ZM12 3L2 8V10L12 15L22 10V8L12 3Z" fill="currentColor"/>
+          </svg>
+        </button>
+        <button id="clearBtn" class="clear-btn" title="清空对话">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+      <div class="welcome-message">
+        <div class="welcome-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM8 17.5C7.17 17.5 6.5 16.83 6.5 16C6.5 15.17 7.17 14.5 8 14.5C8.83 14.5 9.5 15.17 9.5 16C9.5 16.83 8.83 17.5 8 17.5ZM9.5 12C9.5 12.83 8.83 13.5 8 13.5C7.17 13.5 6.5 12.83 6.5 12C6.5 11.17 7.17 10.5 8 10.5C8.83 10.5 9.5 11.17 9.5 12ZM12 18C10.9 18 10 17.1 10 16H14C14 17.1 13.1 18 12 18ZM15.5 13.5C14.67 13.5 14 12.83 14 12C14 11.17 14.67 10.5 15.5 10.5C16.33 10.5 17 11.17 17 12C17 12.83 16.33 13.5 15.5 13.5ZM16 16C16 16.83 15.33 17.5 14.5 17.5C13.67 17.5 13 16.83 13 16H16Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h2>您好！我是您的通用AI助手</h2>
+        <div class="supported-providers">
+          <span class="provider-tag">OpenAI</span>
+          <span class="provider-tag">Azure OpenAI</span>
+          <span class="provider-tag">Claude</span>
+          <span class="provider-tag">本地模型</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-wrapper">
+        <textarea 
+          id="messageInput" 
+          placeholder="输入您的问题..." 
+          rows="1"
+        ></textarea>
+        <button id="sendBtn" class="send-btn" disabled>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      <div class="loading" id="loading" style="display: none;">
+        <div class="loading-dots">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>
