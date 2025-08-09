@@ -10,10 +10,14 @@ class AIChatSidebar {
     this.settings = { ...this.defaultSettings };
     this.isTyping = false;
     this.currentLocale = chrome.i18n.getUILanguage();
+    this.currentConversation = [];
+    this.conversationHistory = [];
+    this.maxHistoryLength = 50;
     
     this.initializeElements();
     this.translateUI();
     this.loadSettings();
+    this.loadConversationHistory();
     this.bindEvents();
   }
   
@@ -23,36 +27,42 @@ class AIChatSidebar {
     this.sendBtn = document.getElementById('sendBtn');
     this.settingsBtn = document.getElementById('settingsBtn');
     this.clearBtn = document.getElementById('clearBtn');
+    this.newChatBtn = document.getElementById('newChatBtn');
+    this.historyBtn = document.getElementById('historyBtn');
+    
     this.settingsPanel = document.getElementById('settingsPanel');
+    this.historyPanel = document.getElementById('historyPanel');
     this.closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    this.closeHistoryBtn = document.getElementById('closeHistoryBtn');
     this.saveSettingsBtn = document.getElementById('saveSettingsBtn');
     
-    // 确认对话框元素
-    this.confirmDialog = document.getElementById('confirmDialog');
+    this.newChatDialog = document.getElementById('newChatDialog');
+    this.clearDialog = document.getElementById('clearDialog');
+    this.cancelNewChatBtn = document.getElementById('cancelNewChatBtn');
+    this.confirmNewChatBtn = document.getElementById('confirmNewChatBtn');
     this.cancelClearBtn = document.getElementById('cancelClearBtn');
     this.confirmClearBtn = document.getElementById('confirmClearBtn');
     
-    // 设置面板元素
     this.apiEndpointInput = document.getElementById('apiEndpoint');
     this.apiKeyInput = document.getElementById('apiKey');
     this.modelInput = document.getElementById('model');
     this.temperatureInput = document.getElementById('temperature');
     this.temperatureValue = document.getElementById('temperatureValue');
+    
+    this.historyList = document.getElementById('historyList');
   }
   
   translateUI() {
-    // 头部
     document.getElementById('headerTitle').textContent = chrome.i18n.getMessage('ai_chat');
+    this.historyBtn.title = chrome.i18n.getMessage('chat_history');
+    this.newChatBtn.title = chrome.i18n.getMessage('new_chat');
     this.clearBtn.title = chrome.i18n.getMessage('clear_conversation');
     
-    // 聊天区域
     document.getElementById('welcomeMessage').textContent = chrome.i18n.getMessage('welcome_message');
     
-    // 输入区域
     this.messageInput.placeholder = chrome.i18n.getMessage('enter_message');
     this.sendBtn.textContent = chrome.i18n.getMessage('send');
     
-    // 设置面板
     document.getElementById('settingsTitle').textContent = chrome.i18n.getMessage('settings');
     document.getElementById('apiEndpointLabel').textContent = chrome.i18n.getMessage('api_endpoint');
     document.getElementById('apiKeyLabel').textContent = chrome.i18n.getMessage('api_key');
@@ -60,20 +70,20 @@ class AIChatSidebar {
     document.getElementById('temperatureLabel').textContent = chrome.i18n.getMessage('temperature');
     this.saveSettingsBtn.textContent = chrome.i18n.getMessage('save_settings');
     
-    // 确认对话框
-    document.getElementById('confirmTitle').textContent = chrome.i18n.getMessage('clear_conversation');
-    document.getElementById('confirmMessage').textContent = chrome.i18n.getMessage('clear_confirm_message');
+    document.getElementById('historyTitle').textContent = chrome.i18n.getMessage('chat_history');
+    
+    document.getElementById('newChatTitle').textContent = chrome.i18n.getMessage('new_chat');
+    document.getElementById('newChatMessage').textContent = chrome.i18n.getMessage('new_chat_confirm_message');
+    document.getElementById('cancelNewChatBtn').textContent = chrome.i18n.getMessage('cancel');
+    document.getElementById('confirmNewChatBtn').textContent = chrome.i18n.getMessage('new_chat');
+    
+    document.getElementById('clearTitle').textContent = chrome.i18n.getMessage('clear_conversation');
+    document.getElementById('clearMessage').textContent = chrome.i18n.getMessage('clear_confirm_message');
     document.getElementById('cancelClearBtn').textContent = chrome.i18n.getMessage('cancel');
     document.getElementById('confirmClearBtn').textContent = chrome.i18n.getMessage('clear');
-    
-    // API端点输入框占位符
-    this.apiEndpointInput.placeholder = 'https://api.openai.com/v1/chat/completions';
-    this.apiKeyInput.placeholder = chrome.i18n.getMessage('api_key');
-    this.modelInput.placeholder = 'gpt-3.5-turbo';
   }
   
   bindEvents() {
-    // 发送消息
     this.sendBtn.addEventListener('click', () => this.sendMessage());
     this.messageInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -82,29 +92,38 @@ class AIChatSidebar {
       }
     });
     
-    // 设置面板
     this.settingsBtn.addEventListener('click', () => this.openSettings());
+    this.historyBtn.addEventListener('click', () => this.openHistory());
+    this.newChatBtn.addEventListener('click', () => this.showNewChatConfirm());
+    this.clearBtn.addEventListener('click', () => this.showClearConfirm());
+    
     this.closeSettingsBtn.addEventListener('click', () => this.closeSettings());
+    this.closeHistoryBtn.addEventListener('click', () => this.closeHistory());
+    
     this.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
     
-    // 清除对话
-    this.clearBtn.addEventListener('click', () => this.showClearConfirm());
-    this.cancelClearBtn.addEventListener('click', () => this.hideClearConfirm());
-    this.confirmClearBtn.addEventListener('click', () => this.clearConversation());
+    this.cancelNewChatBtn.addEventListener('click', () => this.hideNewChatConfirm());
+    this.confirmNewChatBtn.addEventListener('click', () => this.newChat());
     
-    // 温度滑块
+    this.cancelClearBtn.addEventListener('click', () => this.hideClearConfirm());
+    this.confirmClearBtn.addEventListener('click', () => this.clearCurrentConversation());
+    
     this.temperatureInput.addEventListener('input', (e) => {
       this.temperatureValue.textContent = e.target.value;
     });
     
-    // 自动调整输入框高度（支持多行）
     this.messageInput.addEventListener('input', () => {
       this.adjustInputHeight();
     });
     
-    // 点击对话框外部关闭
-    this.confirmDialog.addEventListener('click', (e) => {
-      if (e.target === this.confirmDialog) {
+    this.newChatDialog.addEventListener('click', (e) => {
+      if (e.target === this.newChatDialog) {
+        this.hideNewChatConfirm();
+      }
+    });
+    
+    this.clearDialog.addEventListener('click', (e) => {
+      if (e.target === this.clearDialog) {
         this.hideClearConfirm();
       }
     });
@@ -114,13 +133,11 @@ class AIChatSidebar {
     const input = this.messageInput;
     input.classList.remove('multiline');
     
-    // 检查是否需要多行
     if (input.scrollHeight > input.clientHeight) {
       input.classList.add('multiline');
       input.style.height = 'auto';
       input.style.height = Math.min(input.scrollHeight, 120) + 'px';
     } else {
-      // 保持单行高度
       input.style.height = '36px';
     }
   }
@@ -134,6 +151,29 @@ class AIChatSidebar {
       this.populateSettingsForm();
     } catch (error) {
       console.error('加载设置失败:', error);
+    }
+  }
+  
+  async loadConversationHistory() {
+    try {
+      const result = await chrome.storage.local.get('conversationHistory');
+      if (result.conversationHistory) {
+        this.conversationHistory = result.conversationHistory;
+      }
+    } catch (error) {
+      console.error('加载对话历史失败:', error);
+    }
+  }
+  
+  async saveConversationHistory() {
+    try {
+      if (this.conversationHistory.length > this.maxHistoryLength) {
+        this.conversationHistory = this.conversationHistory.slice(-this.maxHistoryLength);
+      }
+      
+      await chrome.storage.local.set({ conversationHistory: this.conversationHistory });
+    } catch (error) {
+      console.error('保存对话历史失败:', error);
     }
   }
   
@@ -171,20 +211,140 @@ class AIChatSidebar {
     this.settingsPanel.classList.add('hidden');
   }
   
+  openHistory() {
+    this.renderHistoryList();
+    this.historyPanel.classList.remove('hidden');
+  }
+  
+  closeHistory() {
+    this.historyPanel.classList.add('hidden');
+  }
+  
+  renderHistoryList() {
+    this.historyList.innerHTML = '';
+    
+    if (this.conversationHistory.length === 0) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'history-item-empty';
+      emptyDiv.textContent = chrome.i18n.getMessage('no_history');
+      this.historyList.appendChild(emptyDiv);
+      return;
+    }
+    
+    const sortedHistory = [...this.conversationHistory].reverse();
+    
+    sortedHistory.forEach((conversation, index) => {
+      const historyItem = document.createElement('div');
+      historyItem.className = 'history-item';
+      historyItem.dataset.conversationId = conversation.id || conversation.timestamp;
+      
+      const firstMessage = conversation.messages[0];
+      const title = firstMessage ? firstMessage.content.substring(0, 50) + (firstMessage.content.length > 50 ? '...' : '') : 'Empty conversation';
+      const preview = conversation.messages.length > 1 ? 
+        conversation.messages[1].content.substring(0, 80) + (conversation.messages[1].content.length > 80 ? '...' : '') : 'No response';
+      
+      const date = new Date(conversation.timestamp);
+      const dateString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      
+      historyItem.innerHTML = `
+        <div class="history-item-header">
+          <div class="history-item-title">${this.escapeHtml(title)}</div>
+          <div class="history-item-date">${dateString}</div>
+        </div>
+        <div class="history-item-preview">${this.escapeHtml(preview)}</div>
+        <div class="history-item-actions">
+          <button class="delete-history-btn">${chrome.i18n.getMessage('delete')}</button>
+        </div>
+      `;
+      
+      historyItem.addEventListener('click', (e) => {
+
+        if (e.target.classList.contains('delete-history-btn')) {
+          return;
+        }
+        this.loadConversation(conversation);
+        this.closeHistory();
+      });
+      
+      const deleteBtn = historyItem.querySelector('.delete-history-btn');
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.deleteConversation(conversation.id || conversation.timestamp);
+      });
+      
+      this.historyList.appendChild(historyItem);
+    });
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  showNewChatConfirm() {
+    this.newChatDialog.classList.remove('hidden');
+  }
+  
+  hideNewChatConfirm() {
+    this.newChatDialog.classList.add('hidden');
+  }
+  
   showClearConfirm() {
-    this.confirmDialog.classList.remove('hidden');
+    this.clearDialog.classList.remove('hidden');
   }
   
   hideClearConfirm() {
-    this.confirmDialog.classList.add('hidden');
+    this.clearDialog.classList.add('hidden');
   }
   
-  clearConversation() {
-    // 清除其他所有消息
+  async newChat() {
+    if (this.currentConversation.length > 0) {
+      const conversation = {
+        messages: [...this.currentConversation],
+        timestamp: Date.now(),
+        id: Date.now().toString()
+      };
+      this.conversationHistory.push(conversation);
+      await this.saveConversationHistory();
+    }
+    
+    this.clearCurrentConversation();
+    this.hideNewChatConfirm();
+    
+    this.showNotification(chrome.i18n.getMessage('new_chat_created'));
+  }
+  
+  async deleteConversation(conversationId) {
+    this.conversationHistory = this.conversationHistory.filter(conversation => 
+      (conversation.id || conversation.timestamp) !== conversationId
+    );
+    
+    await this.saveConversationHistory();
+    
+    this.renderHistoryList();
+    
+    this.showNotification(chrome.i18n.getMessage('conversation_deleted'));
+  }
+  
+  loadConversation(conversation) {
+    this.clearCurrentConversation();
+
+    this.currentConversation = [...conversation.messages];
+    
+    this.currentConversation.forEach(message => {
+      this.addMessageToUI(message.content, message.sender, false);
+    });
+  }
+  
+  clearCurrentConversation() {
     const messages = this.chatContainer.querySelectorAll('.message:not(.welcome-message)');
     messages.forEach(message => message.remove());
     
+    this.currentConversation = [];
+    
     this.hideClearConfirm();
+    
     this.showNotification(chrome.i18n.getMessage('conversation_cleared'));
   }
   
@@ -193,6 +353,7 @@ class AIChatSidebar {
     if (!message || this.isTyping) return;
     
     this.addMessage(message, 'user');
+    
     this.messageInput.value = '';
     this.messageInput.style.height = '36px';
     this.messageInput.classList.remove('multiline');
@@ -202,6 +363,18 @@ class AIChatSidebar {
   }
   
   addMessage(content, sender) {
+    const messageItem = {
+      content: content,
+      sender: sender,
+      timestamp: Date.now()
+    };
+    
+    this.currentConversation.push(messageItem);
+    
+    this.addMessageToUI(content, sender);
+  }
+  
+  addMessageToUI(content, sender, saveToHistory = true) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
     
@@ -212,12 +385,10 @@ class AIChatSidebar {
     messageDiv.appendChild(contentDiv);
     this.chatContainer.appendChild(messageDiv);
     
-    // 滚动到底部
     this.scrollToBottom();
   }
   
   formatMessage(content) {
-    // 格式化
     return content.replace(/\n/g, '<br>');
   }
   
@@ -241,6 +412,17 @@ class AIChatSidebar {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
     
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant.' }
+    ];
+    
+    this.currentConversation.forEach(item => {
+      messages.push({
+        role: item.sender === 'user' ? 'user' : 'assistant',
+        content: item.content
+      });
+    });
+    
     const response = await fetch(this.settings.apiEndpoint, {
       method: 'POST',
       headers: {
@@ -249,10 +431,7 @@ class AIChatSidebar {
       },
       body: JSON.stringify({
         model: this.settings.model,
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: message }
-        ],
+        messages: messages,
         temperature: this.settings.temperature
       })
     });
@@ -304,7 +483,6 @@ class AIChatSidebar {
   }
 }
 
-// 初始化应用
 document.addEventListener('DOMContentLoaded', () => {
   new AIChatSidebar();
 });

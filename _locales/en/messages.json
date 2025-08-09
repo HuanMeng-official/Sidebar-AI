@@ -12,7 +12,7 @@
     "description": "Action button title"
   },
   "ai_chat": {
-    "message": "AI Chat",
+    "message": "Sidebar AI",
     "description": "Header title"
   },
   "settings": {
@@ -67,6 +67,10 @@
     "message": "Sorry, an error occurred: ",
     "description": "API error message prefix"
   },
+  "new_chat": {
+    "message": "New Chat",
+    "description": "New chat button title"
+  },
   "clear_conversation": {
     "message": "Clear Conversation",
     "description": "Clear conversation button title"
@@ -74,6 +78,10 @@
   "clear_confirm_message": {
     "message": "Are you sure you want to clear all messages?",
     "description": "Clear confirmation message"
+  },
+  "new_chat_confirm_message": {
+    "message": "Start a new conversation? Current conversation will be saved.",
+    "description": "New chat confirmation message"
   },
   "cancel": {
     "message": "Cancel",
@@ -83,8 +91,28 @@
     "message": "Clear",
     "description": "Clear button text"
   },
+  "delete": {
+    "message": "Delete",
+    "description": "Delete button text"
+  },
   "conversation_cleared": {
     "message": "Conversation cleared",
     "description": "Conversation cleared notification"
+  },
+  "new_chat_created": {
+    "message": "New chat created",
+    "description": "New chat created notification"
+  },
+  "conversation_deleted": {
+    "message": "Conversation deleted",
+    "description": "Conversation deleted notification"
+  },
+  "chat_history": {
+    "message": "Chat History",
+    "description": "Chat history panel title"
+  },
+  "no_history": {
+    "message": "No conversation history",
+    "description": "No history message"
   }
 }

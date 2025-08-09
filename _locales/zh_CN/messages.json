@@ -1,6 +1,6 @@
 {
   "extension_name": {
-    "message": "侧边栏AI",
+    "message": "侧边栏 AI",
     "description": "扩展名称"
   },
   "extension_description": {
@@ -12,7 +12,7 @@
     "description": "操作按钮标题"
   },
   "ai_chat": {
-    "message": "AI聊天",
+    "message": "Sidebar AI",
     "description": "头部标题"
   },
   "settings": {
@@ -20,11 +20,11 @@
     "description": "设置面板标题"
   },
   "api_endpoint": {
-    "message": "API端点",
+    "message": "API 端点",
     "description": "API端点标签"
   },
   "api_key": {
-    "message": "API密钥",
+    "message": "API 密钥",
     "description": "API密钥标签"
   },
   "model": {
@@ -67,6 +67,10 @@
     "message": "抱歉，发生错误：",
     "description": "API错误消息前缀"
   },
+  "new_chat": {
+    "message": "新建对话",
+    "description": "新建对话按钮标题"
+  },
   "clear_conversation": {
     "message": "清除对话",
     "description": "清除对话按钮标题"
@@ -74,6 +78,10 @@
   "clear_confirm_message": {
     "message": "确定要清除所有消息吗？",
     "description": "清除确认消息"
+  },
+  "new_chat_confirm_message": {
+    "message": "开始新对话？当前对话将被保存。",
+    "description": "新建对话确认消息"
   },
   "cancel": {
     "message": "取消",
@@ -83,8 +91,28 @@
     "message": "清除",
     "description": "清除按钮文本"
   },
+  "delete": {
+    "message": "删除",
+    "description": "删除按钮文本"
+  },
   "conversation_cleared": {
     "message": "对话已清除",
     "description": "对话清除通知"
+  },
+  "new_chat_created": {
+    "message": "新对话已创建",
+    "description": "新对话创建通知"
+  },
+  "conversation_deleted": {
+    "message": "对话已删除",
+    "description": "对话删除通知"
+  },
+  "chat_history": {
+    "message": "对话历史",
+    "description": "对话历史面板标题"
+  },
+  "no_history": {
+    "message": "暂无对话历史",
+    "description": "无历史消息"
   }
 }

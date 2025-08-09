@@ -8,16 +8,16 @@
 </head>
 <body>
   <div class="container">
-    <!-- 顶部栏 -->
     <div class="header">
       <h1 id="headerTitle">Sidebar AI</h1>
       <div class="header-buttons">
+        <button id="historyBtn" class="history-btn" title="Chat History">🕒</button>
+        <button id="newChatBtn" class="new-chat-btn" title="New Chat">💬</button>
         <button id="clearBtn" class="clear-btn" title="Clear Conversation">🗑️</button>
         <button id="settingsBtn" class="settings-btn">⚙️</button>
       </div>
     </div>
 
-    <!-- 聊天区域 -->
     <div id="chatContainer" class="chat-container">
       <div class="message ai-message welcome-message">
         <div class="message-content">
@@ -26,7 +26,6 @@
       </div>
     </div>
 
-    <!-- 输入区域 -->
     <div class="input-container">
       <textarea 
         id="messageInput" 
@@ -36,7 +35,6 @@
       <button id="sendBtn" class="send-btn">Send</button>
     </div>
 
-    <!-- 设置面板 -->
     <div id="settingsPanel" class="settings-panel hidden">
       <div class="settings-header">
         <h2 id="settingsTitle">Settings</h2>
@@ -69,14 +67,36 @@
       </div>
     </div>
 
-    <!-- 确认对话框 -->
-    <div id="confirmDialog" class="confirm-dialog hidden">
+    <div id="newChatDialog" class="confirm-dialog hidden">
       <div class="confirm-content">
-        <h3 id="confirmTitle">Clear Conversation</h3>
-        <p id="confirmMessage">Are you sure you want to clear all messages?</p>
+        <h3 id="newChatTitle">New Chat</h3>
+        <p id="newChatMessage">Start a new conversation? Current conversation will be saved.</p>
+        <div class="confirm-buttons">
+          <button id="confirmNewChatBtn" class="confirm-clear-btn">New Chat</button>
+          <button id="cancelNewChatBtn" class="cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="clearDialog" class="confirm-dialog hidden">
+      <div class="confirm-content">
+        <h3 id="clearTitle">Clear Conversation</h3>
+        <p id="clearMessage">Are you sure you want to clear all messages?</p>
         <div class="confirm-buttons">
           <button id="confirmClearBtn" class="confirm-clear-btn">Clear</button>
           <button id="cancelClearBtn" class="cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="historyPanel" class="history-panel hidden">
+      <div class="history-header">
+        <h2 id="historyTitle">Chat History</h2>
+        <button id="closeHistoryBtn" class="close-btn">×</button>
+      </div>
+      
+      <div class="history-content">
+        <div id="historyList" class="history-list">
         </div>
       </div>
     </div>

@@ -84,6 +84,58 @@ body {
   align-items: center;
 }
 
+.history-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--ios-system-gray);
+  padding: 6px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.history-btn:hover {
+  background-color: var(--ios-system-gray5);
+  transform: scale(1.05);
+}
+
+.history-btn:active {
+  background-color: var(--ios-system-gray4);
+  transform: scale(0.95);
+}
+
+.new-chat-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--ios-system-blue);
+  padding: 6px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.new-chat-btn:hover {
+  background-color: var(--ios-system-gray5);
+  transform: scale(1.05);
+}
+
+.new-chat-btn:active {
+  background-color: var(--ios-system-gray4);
+  transform: scale(0.95);
+}
+
 .clear-btn {
   background: none;
   border: none;
@@ -618,21 +670,167 @@ body {
   background-color: var(--ios-system-gray6);
 }
 
+/* 对话历史面板 */
+.history-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ios-secondary-background);
+  z-index: 250;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--ios-heavy-shadow);
+  transform: translateX(0);
+  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  border-radius: 20px 20px 0 0;
+}
+
+.history-panel.hidden {
+  transform: translateX(100%);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--ios-system-gray5);
+  background-color: var(--ios-secondary-background);
+  position: relative;
+}
+
+.history-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--ios-system-gray5), transparent);
+}
+
+.history-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ios-label);
+  letter-spacing: -0.41px;
+}
+
+.history-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  background-color: var(--ios-tertiary-background);
+  border: 0.5px solid var(--ios-system-gray5);
+  border-radius: var(--ios-small-border-radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.history-item:hover {
+  background-color: var(--ios-system-gray6);
+  transform: translateY(-1px);
+}
+
+.history-item:active {
+  transform: translateY(0);
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.history-item-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ios-label);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item-date {
+  font-size: 12px;
+  color: var(--ios-secondary-label);
+  margin-left: 8px;
+}
+
+.history-item-preview {
+  font-size: 14px;
+  color: var(--ios-secondary-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.delete-history-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--ios-system-red);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.delete-history-btn:hover {
+  background-color: var(--ios-system-gray5);
+}
+
+.delete-history-btn:active {
+  background-color: var(--ios-system-gray4);
+}
+
+.history-item-empty {
+  text-align: center;
+  color: var(--ios-secondary-label);
+  font-size: 15px;
+  padding: 32px 16px;
+}
+
 /* 滚动条样式 */
-.chat-container::-webkit-scrollbar {
+.chat-container::-webkit-scrollbar,
+.history-content::-webkit-scrollbar {
   width: 4px;
 }
 
-.chat-container::-webkit-scrollbar-track {
+.chat-container::-webkit-scrollbar-track,
+.history-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.chat-container::-webkit-scrollbar-thumb {
+.chat-container::-webkit-scrollbar-thumb,
+.history-content::-webkit-scrollbar-thumb {
   background-color: var(--ios-system-gray3);
   border-radius: 2px;
 }
 
-.chat-container::-webkit-scrollbar-thumb:hover {
+.chat-container::-webkit-scrollbar-thumb:hover,
+.history-content::-webkit-scrollbar-thumb:hover {
   background-color: var(--ios-system-gray2);
 }
 
@@ -679,6 +877,8 @@ body {
     line-height: 1.4;
   }
   
+  .history-btn,
+  .new-chat-btn,
   .clear-btn,
   .settings-btn {
     width: 28px;
@@ -705,9 +905,21 @@ body {
     padding: 14px;
     font-size: 16px;
   }
+  
+  .history-item {
+    padding: 14px;
+  }
+  
+  .history-item-title {
+    font-size: 15px;
+  }
+  
+  .history-item-preview {
+    font-size: 13px;
+  }
 }
 
-/* 暗黑模式 */
+/* 暗黑模式支持 */
 @media (prefers-color-scheme: dark) {
   :root {
     --ios-background: #000000;
@@ -728,7 +940,9 @@ body {
   .input-container,
   .settings-panel,
   .settings-header,
-  .confirm-content {
+  .confirm-content,
+  .history-panel,
+  .history-header {
     background-color: rgba(28, 28, 30, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -736,7 +950,8 @@ body {
   
   .message-input,
   .setting-item input,
-  .setting-item select {
+  .setting-item select,
+  .history-item {
     background-color: var(--ios-tertiary-background);
     border-color: var(--ios-system-gray4);
   }
@@ -754,7 +969,12 @@ body {
   }
   
   .cancel-btn:hover,
-  .confirm-clear-btn:hover {
+  .confirm-clear-btn:hover,
+  .history-item:hover {
+    background-color: var(--ios-system-gray5);
+  }
+  
+  .delete-history-btn:hover {
     background-color: var(--ios-system-gray5);
   }
 }
