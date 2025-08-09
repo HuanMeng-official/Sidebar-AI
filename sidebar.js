@@ -58,8 +58,6 @@ class AIChatSidebar {
     this.newChatBtn.title = chrome.i18n.getMessage('new_chat');
     this.clearBtn.title = chrome.i18n.getMessage('clear_conversation');
     
-    document.getElementById('welcomeMessage').textContent = chrome.i18n.getMessage('welcome_message');
-    
     this.messageInput.placeholder = chrome.i18n.getMessage('enter_message');
     this.sendBtn.textContent = chrome.i18n.getMessage('send');
     
@@ -334,13 +332,11 @@ class AIChatSidebar {
   }
   
   clearCurrentConversation() {
-    const messages = this.chatContainer.querySelectorAll('.message:not(.welcome-message)');
+    const messages = this.chatContainer.querySelectorAll('.message');
     messages.forEach(message => message.remove());
     
     this.currentConversation = [];
-    
     this.hideClearConfirm();
-    
     this.showNotification(chrome.i18n.getMessage('conversation_cleared'));
   }
   

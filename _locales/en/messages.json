@@ -47,10 +47,6 @@
     "message": "Send",
     "description": "Send button text"
   },
-  "welcome_message": {
-    "message": "Hello! I'm your AI assistant. How can I help you today?",
-    "description": "Welcome message"
-  },
   "settings_saved": {
     "message": "Settings saved successfully",
     "description": "Settings saved notification"
