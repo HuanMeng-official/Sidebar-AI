@@ -266,10 +266,47 @@ body {
   border: 0.5px solid var(--ios-system-gray5);
 }
 
-.welcome-message .message-content {
-  background-color: var(--ios-secondary-background);
+/* 文件预览样式 */
+.message-files {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.message-file-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.message-file-preview:last-child {
+  margin-bottom: 0;
+}
+
+.file-icon {
+  font-size: 16px;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 13px;
+  color: var(--ios-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 11px;
   color: var(--ios-secondary-label);
-  border: 0.5px solid var(--ios-system-gray5);
 }
 
 /* Markdown 样式 */
@@ -434,15 +471,6 @@ body {
   background-color: var(--ios-tertiary-background);
 }
 
-/* 响应式表格 */
-@media (max-width: 400px) {
-  .message-content table.markdown-table th,
-  .message-content table.markdown-table td {
-    padding: 8px 10px;
-    font-size: 13px;
-  }
-}
-
 /* 打字指示器 */
 .typing-indicator .message-content {
   background-color: var(--ios-secondary-background);
@@ -479,8 +507,8 @@ body {
   padding: 10px 12px;
   border-top: 0.5px solid var(--ios-system-gray5);
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  align-items: center;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, 0.8);
@@ -496,6 +524,108 @@ body {
   right: 0;
   height: 1px;
   background: linear-gradient(to right, transparent, var(--ios-system-gray5), transparent);
+}
+
+/* 文件上传区域 */
+.file-upload-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.file-upload-area.hidden {
+  display: none;
+}
+
+.file-upload-content {
+  background-color: var(--ios-secondary-background);
+  border-radius: 14px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: var(--ios-heavy-shadow);
+  max-width: 300px;
+  width: 90%;
+}
+
+.file-upload-text {
+  font-size: 16px;
+  color: var(--ios-label);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.file-upload-progress {
+  width: 100%;
+}
+
+.file-upload-progress.hidden {
+  display: none;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--ios-system-gray4);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ios-system-blue), #0a84ff);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 14px;
+  color: var(--ios-secondary-label);
+}
+
+/* 输入控制区域 */
+.input-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.attach-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--ios-system-gray);
+  padding: 6px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  flex-shrink: 0;
+}
+
+.attach-btn:hover {
+  background-color: var(--ios-system-gray5);
+  transform: scale(1.05);
+}
+
+.attach-btn:active {
+  background-color: var(--ios-system-gray4);
+  transform: scale(0.95);
 }
 
 .message-input {
@@ -563,6 +693,114 @@ body {
   min-height: 36px;
   padding: 8px 14px;
   line-height: 1.4;
+}
+
+/* 文件预览区域 */
+.file-preview-container {
+  width: 100%;
+  background-color: var(--ios-tertiary-background);
+  border: 0.5px solid var(--ios-system-gray4);
+  border-radius: var(--ios-small-border-radius);
+  padding: 12px;
+}
+
+.file-preview-container.hidden {
+  display: none;
+}
+
+.file-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.file-preview-header span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ios-secondary-label);
+}
+
+.clear-files-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--ios-system-gray);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.clear-files-btn:hover {
+  background-color: var(--ios-system-gray5);
+}
+
+.file-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: var(--ios-secondary-background);
+  border: 0.5px solid var(--ios-system-gray4);
+  border-radius: 8px;
+}
+
+.file-preview-icon {
+  font-size: 16px;
+  color: var(--ios-system-blue);
+}
+
+.file-preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-preview-name {
+  font-size: 13px;
+  color: var(--ios-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-preview-size {
+  font-size: 11px;
+  color: var(--ios-secondary-label);
+}
+
+.file-preview-remove {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--ios-system-red);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.file-preview-remove:hover {
+  background-color: var(--ios-system-gray5);
+}
+
+/* 隐藏文件输入框 */
+#fileInput {
+  display: none;
 }
 
 /* 设置面板 */
@@ -1093,6 +1331,20 @@ body {
   .history-item-preview {
     font-size: 13px;
   }
+  
+  .attach-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .file-preview-name {
+    font-size: 12px;
+  }
+  
+  .file-preview-size {
+    font-size: 10px;
+  }
 }
 
 /* 暗黑模式支持 */
@@ -1133,7 +1385,6 @@ body {
   }
   
   .ai-message .message-content,
-  .welcome-message .message-content,
   .typing-indicator .message-content {
     background-color: var(--ios-secondary-background);
     border-color: var(--ios-system-gray4);
@@ -1169,22 +1420,16 @@ body {
     color: #0a84ff;
     border-bottom-color: #0a84ff;
   }
-
-  .message-content table.markdown-table {
+  
+  .message-files {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .message-file-preview {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .file-upload-content {
     background-color: var(--ios-secondary-background);
-    border-color: var(--ios-system-gray4);
-  }
-  
-  .message-content table.markdown-table th {
-    background-color: var(--ios-system-gray5);
-    border-color: var(--ios-system-gray4);
-  }
-  
-  .message-content table.markdown-table td {
-    border-color: var(--ios-system-gray4);
-  }
-  
-  .message-content table.markdown-table tr:nth-child(even) {
-    background-color: var(--ios-tertiary-background);
   }
 }

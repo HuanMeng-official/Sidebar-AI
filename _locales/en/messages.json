@@ -114,5 +114,21 @@
   "no_history": {
     "message": "No conversation history",
     "description": "No history message"
+  },
+  "drop_files_here": {
+    "message": "Drop files here or click to upload",
+    "description": "Drop files area text"
+  },
+  "attached_files": {
+    "message": "Attached Files",
+    "description": "Attached files section title"
+  },
+  "file_too_large": {
+    "message": "File is too large (max 10MB)",
+    "description": "File too large error message"
+  },
+  "attach_file": {
+    "message": "Attach File",
+    "description": "Attach file button title"
   }
 }

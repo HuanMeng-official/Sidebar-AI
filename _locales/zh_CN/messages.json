@@ -114,5 +114,21 @@
   "no_history": {
     "message": "暂无对话历史",
     "description": "无历史消息"
+  },
+  "drop_files_here": {
+    "message": "拖拽文件到此处或点击上传",
+    "description": "拖拽文件区域文本"
+  },
+  "attached_files": {
+    "message": "附加文件",
+    "description": "附加文件区域标题"
+  },
+  "file_too_large": {
+    "message": "文件过大（最大10MB）",
+    "description": "文件过大错误消息"
+  },
+  "attach_file": {
+    "message": "附加文件",
+    "description": "附加文件按钮标题"
   }
 }

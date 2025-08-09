@@ -17,25 +17,47 @@
         <button id="settingsBtn" class="settings-btn">⚙️</button>
       </div>
     </div>
-
     <div id="chatContainer" class="chat-container">
     </div>
-
     <div class="input-container">
-      <textarea 
-        id="messageInput" 
-        placeholder="Enter message..." 
-        class="message-input"
-      ></textarea>
-      <button id="sendBtn" class="send-btn">Send</button>
+      <div id="fileUploadArea" class="file-upload-area hidden">
+        <div class="file-upload-content">
+          <span class="file-upload-text" id="fileUploadText">Drop files here or click to upload</span>
+          <div class="file-upload-progress hidden">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="progress-text" id="progressText">0%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-controls">
+        <button id="attachBtn" class="attach-btn" title="Attach File">📎</button>
+        <textarea 
+          id="messageInput" 
+          placeholder="Enter message..." 
+          class="message-input"
+        ></textarea>
+        <button id="sendBtn" class="send-btn">Send</button>
+      </div>
+      
+      <div id="filePreviewContainer" class="file-preview-container hidden">
+        <div class="file-preview-header">
+          <span id="filePreviewTitle">Attached Files</span>
+          <button id="clearFilesBtn" class="clear-files-btn">×</button>
+        </div>
+        <div id="filePreviewList" class="file-preview-list"></div>
+      </div>
     </div>
-
+    
+    <input type="file" id="fileInput" class="hidden" multiple accept="image/*">
+    
     <div id="settingsPanel" class="settings-panel hidden">
       <div class="settings-header">
         <h2 id="settingsTitle">Settings</h2>
         <button id="closeSettingsBtn" class="close-btn">×</button>
       </div>
-      
       <div class="settings-content">
         <div class="setting-item">
           <label for="apiType" id="apiTypeLabel">API Type</label>
@@ -44,32 +66,27 @@
             <option value="openai">OpenAI</option>
           </select>
         </div>
-        
         <div class="setting-item">
           <label for="apiEndpoint" id="apiEndpointLabel">API Endpoint</label>
           <input type="text" id="apiEndpoint" placeholder="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent">
         </div>
-        
         <div class="setting-item">
           <label for="apiKey" id="apiKeyLabel">API Key</label>
           <input type="password" id="apiKey" placeholder="Enter your API key">
         </div>
-        
         <div class="setting-item">
           <label for="model" id="modelLabel">Model</label>
           <input type="text" id="model" placeholder="gemini-2.5-flash" value="gemini-2.5-flash">
         </div>
-        
         <div class="setting-item">
           <label for="temperature" id="temperatureLabel">Temperature (0-1)</label>
           <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7">
           <span id="temperatureValue">0.7</span>
         </div>
-        
         <button id="saveSettingsBtn" class="save-btn">Save Settings</button>
       </div>
     </div>
-
+    
     <div id="newChatDialog" class="confirm-dialog hidden">
       <div class="confirm-content">
         <h3 id="newChatTitle">New Chat</h3>
@@ -80,7 +97,6 @@
         </div>
       </div>
     </div>
-
     <div id="clearDialog" class="confirm-dialog hidden">
       <div class="confirm-content">
         <h3 id="clearTitle">Clear Conversation</h3>
@@ -91,20 +107,17 @@
         </div>
       </div>
     </div>
-
     <div id="historyPanel" class="history-panel hidden">
       <div class="history-header">
         <h2 id="historyTitle">Chat History</h2>
         <button id="closeHistoryBtn" class="close-btn">×</button>
       </div>
-      
       <div class="history-content">
         <div id="historyList" class="history-list">
         </div>
       </div>
     </div>
   </div>
-
   <script src="sidebar.js"></script>
 </body>
 </html>
