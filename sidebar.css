@@ -243,10 +243,10 @@ body {
 }
 
 .message-content {
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: var(--ios-border-radius);
   font-size: 15px;
-  line-height: 1.4;
+  line-height: 1.5;
   box-shadow: var(--ios-shadow);
   position: relative;
   overflow: hidden;
@@ -270,6 +270,177 @@ body {
   background-color: var(--ios-secondary-background);
   color: var(--ios-secondary-label);
   border: 0.5px solid var(--ios-system-gray5);
+}
+
+/* Markdown 样式 */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+  margin: 12px 0 8px 0;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.message-content h1 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--ios-system-gray4);
+  padding-bottom: 4px;
+}
+
+.message-content h2 {
+  font-size: 1.4em;
+  border-bottom: 1px solid var(--ios-system-gray4);
+  padding-bottom: 4px;
+}
+
+.message-content h3 {
+  font-size: 1.3em;
+}
+
+.message-content h4 {
+  font-size: 1.2em;
+}
+
+.message-content h5 {
+  font-size: 1.1em;
+}
+
+.message-content h6 {
+  font-size: 1em;
+  color: var(--ios-secondary-label);
+}
+
+.message-content p {
+  margin: 8px 0;
+}
+
+.message-content strong {
+  font-weight: 600;
+}
+
+.message-content em {
+  font-style: italic;
+}
+
+.message-content code {
+  background-color: var(--ios-system-gray6);
+  border: 0.5px solid var(--ios-system-gray4);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 0.9em;
+  color: var(--ios-system-red);
+}
+
+.message-content pre {
+  background-color: var(--ios-tertiary-background);
+  border: 0.5px solid var(--ios-system-gray4);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  overflow-x: auto;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.message-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ios-label);
+}
+
+.message-content ul,
+.message-content ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.message-content li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.message-content ul li {
+  list-style-type: disc;
+}
+
+.message-content ol li {
+  list-style-type: decimal;
+}
+
+.message-content a {
+  color: var(--ios-system-blue);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ios-system-blue);
+}
+
+.message-content a:hover {
+  text-decoration: underline;
+}
+
+.message-content hr {
+  border: none;
+  border-top: 1px solid var(--ios-system-gray4);
+  margin: 16px 0;
+}
+
+.message-content blockquote {
+  border-left: 3px solid var(--ios-system-blue);
+  margin: 8px 0;
+  padding-left: 12px;
+  color: var(--ios-secondary-label);
+}
+
+.message-content table.markdown-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+  background-color: var(--ios-secondary-background);
+  border: 0.5px solid var(--ios-system-gray4);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.message-content table.markdown-table th,
+.message-content table.markdown-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 0.5px solid var(--ios-system-gray4);
+  border-right: 0.5px solid var(--ios-system-gray4);
+}
+
+.message-content table.markdown-table th:last-child,
+.message-content table.markdown-table td:last-child {
+  border-right: none;
+}
+
+.message-content table.markdown-table th {
+  background-color: var(--ios-system-gray6);
+  font-weight: 600;
+  color: var(--ios-label);
+  border-bottom: 1px solid var(--ios-system-gray4);
+}
+
+.message-content table.markdown-table tr:last-child td {
+  border-bottom: none;
+}
+
+.message-content table.markdown-table tr:nth-child(even) {
+  background-color: var(--ios-tertiary-background);
+}
+
+/* 响应式表格 */
+@media (max-width: 400px) {
+  .message-content table.markdown-table th,
+  .message-content table.markdown-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
 }
 
 /* 打字指示器 */
@@ -845,9 +1016,14 @@ body {
   }
   
   .message-content {
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 14px;
   }
+  
+  .message-content h1 { font-size: 1.4em; }
+  .message-content h2 { font-size: 1.3em; }
+  .message-content h3 { font-size: 1.2em; }
+  .message-content h4 { font-size: 1.1em; }
   
   .message-input,
   .send-btn {
@@ -976,5 +1152,39 @@ body {
   
   .delete-history-btn:hover {
     background-color: var(--ios-system-gray5);
+  }
+  
+  .message-content code {
+    background-color: var(--ios-system-gray5);
+    border-color: var(--ios-system-gray4);
+    color: #ff453a;
+  }
+  
+  .message-content pre {
+    background-color: var(--ios-tertiary-background);
+    border-color: var(--ios-system-gray4);
+  }
+  
+  .message-content a {
+    color: #0a84ff;
+    border-bottom-color: #0a84ff;
+  }
+
+  .message-content table.markdown-table {
+    background-color: var(--ios-secondary-background);
+    border-color: var(--ios-system-gray4);
+  }
+  
+  .message-content table.markdown-table th {
+    background-color: var(--ios-system-gray5);
+    border-color: var(--ios-system-gray4);
+  }
+  
+  .message-content table.markdown-table td {
+    border-color: var(--ios-system-gray4);
+  }
+  
+  .message-content table.markdown-table tr:nth-child(even) {
+    background-color: var(--ios-tertiary-background);
   }
 }

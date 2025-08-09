@@ -258,7 +258,6 @@ class AIChatSidebar {
       `;
       
       historyItem.addEventListener('click', (e) => {
-
         if (e.target.classList.contains('delete-history-btn')) {
           return;
         }
@@ -321,15 +320,12 @@ class AIChatSidebar {
     );
     
     await this.saveConversationHistory();
-    
     this.renderHistoryList();
-    
     this.showNotification(chrome.i18n.getMessage('conversation_deleted'));
   }
   
   loadConversation(conversation) {
     this.clearCurrentConversation();
-
     this.currentConversation = [...conversation.messages];
     
     this.currentConversation.forEach(message => {
@@ -380,7 +376,7 @@ class AIChatSidebar {
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.innerHTML = this.formatMessage(content);
+    contentDiv.innerHTML = this.renderMarkdown(content);
     
     messageDiv.appendChild(contentDiv);
     this.chatContainer.appendChild(messageDiv);
@@ -388,8 +384,69 @@ class AIChatSidebar {
     this.scrollToBottom();
   }
   
-  formatMessage(content) {
-    return content.replace(/\n/g, '<br>');
+  renderMarkdown(text) {
+    let html = this.escapeHtml(text);
+    html = this.renderTables(html);
+    html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    html = html.replace(/^(\s*)-\s+(.*)$/gm, '$1<li>$2</li>');
+    html = html.replace(/(<li>.*<\/li>)+/gs, '<ul>$&</ul>');
+    html = html.replace(/^(\s*)\d+\.\s+(.*)$/gm, '$1<li>$2</li>');
+    html = html.replace(/(<li>.*<\/li>)+/gs, '<ol>$&</ol>');
+    html = html.replace(/^###### (.*$)/gm, '<h6>$1</h6>');
+    html = html.replace(/^##### (.*$)/gm, '<h5>$1</h5>');
+    html = html.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
+    html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+    html = html.replace(/^---$/gm, '<hr>');
+    html = html.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
+    html = html.replace(/\n/g, '<br>');
+    
+    return html;
+  }
+  
+  renderTables(html) {
+    const tableRegex = /(\|(?:[^\n]*\|)+\n\|(?:\s*[-:]+\s*\|)+\n(?:\|(?:[^\n]*\|)+\n?)*)/g;
+    
+    return html.replace(tableRegex, (match) => {
+      const lines = match.trim().split('\n');
+      if (lines.length < 2) return match;
+      
+      const headerLine = lines[0];
+      const separatorLine = lines[1];
+      const headers = headerLine.split('|').filter(cell => cell.trim() !== '');
+      const separators = separatorLine.split('|').filter(cell => cell.trim() !== '');
+      
+      if (headers.length !== separators.length) return match;
+      
+      let tableHtml = '<table class="markdown-table">';
+      
+      tableHtml += '<thead><tr>';
+      headers.forEach(header => {
+        tableHtml += `<th>${this.escapeHtml(header.trim())}</th>`;
+      });
+      tableHtml += '</tr></thead>';
+      
+      tableHtml += '<tbody>';
+      for (let i = 2; i < lines.length; i++) {
+        const rowLine = lines[i];
+        const cells = rowLine.split('|').filter(cell => cell.trim() !== '');
+        if (cells.length === headers.length) {
+          tableHtml += '<tr>';
+          cells.forEach(cell => {
+            tableHtml += `<td>${this.escapeHtml(cell.trim())}</td>`;
+          });
+          tableHtml += '</tr>';
+        }
+      }
+      tableHtml += '</tbody></table>';
+      
+      return tableHtml;
+    });
   }
   
   async getAIResponse(userMessage) {
