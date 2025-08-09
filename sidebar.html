@@ -1,69 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sidebar AI</title>
   <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
-  <div class="sidebar-container">
+  <div class="container">
+    <!-- 顶部栏 -->
     <div class="header">
-      <div class="header-content">
-        <h1>Sidebar AI</h1>
-        <div class="header-actions">
-          <button id="settingsBtn" class="winui-button icon" title="Settings">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="icon-settings">
-              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
-              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-            </svg>
-          </button>
-          <button id="clearBtn" class="winui-button icon" title="">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="icon-clear">
-              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
-            </svg>
-          </button>
+      <h1 id="headerTitle">Sidebar AI</h1>
+      <div class="header-buttons">
+        <button id="clearBtn" class="clear-btn" title="Clear Conversation">🗑️</button>
+        <button id="settingsBtn" class="settings-btn">⚙️</button>
+      </div>
+    </div>
+
+    <!-- 聊天区域 -->
+    <div id="chatContainer" class="chat-container">
+      <div class="message ai-message welcome-message">
+        <div class="message-content">
+          <p id="welcomeMessage">Hello! I'm your AI assistant. How can I help you today?</p>
         </div>
       </div>
     </div>
 
-    <div class="chat-container" id="chatContainer">
-      <div class="welcome-message">
-        <div class="welcome-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="icon-robot">
-            <path d="M9 11H15V13H9V11ZM12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H9L3 7V9H5V21H19V9H21ZM7 20V9H9V20H7ZM17 20V9H15V20H17Z" fill="currentColor"/>
-          </svg>
-        </div>
-        <h2 id="welcomeTitle"></h2>
-        <p id="welcomeMessage"></p>
-        <div class="supported-providers">
-          <span class="provider-tag" id="openaiTag"></span>
-          <span class="provider-tag" id="azureTag"></span>
-          <span class="provider-tag" id="claudeTag"></span>
-          <span class="provider-tag" id="localTag"></span>
-        </div>
-      </div>
-    </div>
-
+    <!-- 输入区域 -->
     <div class="input-container">
-      <div class="input-wrapper">
-        <textarea 
-          id="messageInput" 
-          class="winui-textarea"
-          placeholder="" 
-          rows="1"
-        ></textarea>
-        <button id="sendBtn" class="winui-button icon primary" disabled>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="icon-send">
-            <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
-          </svg>
-        </button>
+      <textarea 
+        id="messageInput" 
+        placeholder="Enter message..." 
+        class="message-input"
+      ></textarea>
+      <button id="sendBtn" class="send-btn">Send</button>
+    </div>
+
+    <!-- 设置面板 -->
+    <div id="settingsPanel" class="settings-panel hidden">
+      <div class="settings-header">
+        <h2 id="settingsTitle">Settings</h2>
+        <button id="closeSettingsBtn" class="close-btn">×</button>
       </div>
-      <div class="loading" id="loading" style="display: none;">
-        <div class="loading-dots">
-          <div></div>
-          <div></div>
-          <div></div>
+      
+      <div class="settings-content">
+        <div class="setting-item">
+          <label for="apiEndpoint" id="apiEndpointLabel">API Endpoint</label>
+          <input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+        </div>
+        
+        <div class="setting-item">
+          <label for="apiKey" id="apiKeyLabel">API Key</label>
+          <input type="password" id="apiKey" placeholder="Enter your API key">
+        </div>
+        
+        <div class="setting-item">
+          <label for="model" id="modelLabel">Model</label>
+          <input type="text" id="model" placeholder="gpt-3.5-turbo" value="gpt-3.5-turbo">
+        </div>
+        
+        <div class="setting-item">
+          <label for="temperature" id="temperatureLabel">Temperature (0-1)</label>
+          <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7">
+          <span id="temperatureValue">0.7</span>
+        </div>
+        
+        <button id="saveSettingsBtn" class="save-btn">Save Settings</button>
+      </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div id="confirmDialog" class="confirm-dialog hidden">
+      <div class="confirm-content">
+        <h3 id="confirmTitle">Clear Conversation</h3>
+        <p id="confirmMessage">Are you sure you want to clear all messages?</p>
+        <div class="confirm-buttons">
+          <button id="confirmClearBtn" class="confirm-clear-btn">Clear</button>
+          <button id="cancelClearBtn" class="cancel-btn">Cancel</button>
         </div>
       </div>
     </div>

@@ -1,154 +1,90 @@
 {
-    "extensionName": {
-      "message": "Sidebar AI",
-      "description": "扩展名称"
-    },
-    "extensionDescription": {
-      "message": "侧边栏AI",
-      "description": "扩展描述"
-    },
-    "settingsTitle": {
-      "message": "Sidebar AI设置",
-      "description": "设置页面标题"
-    },
-    "apiEndpoint": {
-      "message": "API端点",
-      "description": "API端点标签"
-    },
-    "apiKey": {
-      "message": "API密钥",
-      "description": "API密钥标签"
-    },
-    "model": {
-      "message": "模型",
-      "description": "模型标签"
-    },
-    "saveSettings": {
-      "message": "保存设置",
-      "description": "保存设置按钮"
-    },
-    "testConnection": {
-      "message": "测试连接",
-      "description": "测试连接按钮"
-    },
-    "openSidebar": {
-      "message": "打开侧边栏",
-      "description": "打开侧边栏按钮"
-    },
-    "openNewTab": {
-      "message": "在新标签页中打开",
-      "description": "在新标签页中打开按钮"
-    },
-    "enterApiEndpoint": {
-      "message": "输入API端点",
-      "description": "API端点占位符"
-    },
-    "enterApiKey": {
-      "message": "输入您的API密钥",
-      "description": "API密钥占位符"
-    },
-    "enterModel": {
-      "message": "输入模型名称",
-      "description": "模型占位符"
-    },
-    "settingsSaved": {
-      "message": "设置保存成功！",
-      "description": "设置保存成功消息"
-    },
-    "fillRequiredFields": {
-      "message": "请填写必填字段",
-      "description": "必填字段错误消息"
-    },
-    "testingConnection": {
-      "message": "正在测试连接...",
-      "description": "测试连接消息"
-    },
-    "connectionSuccessful": {
-      "message": "连接成功！",
-      "description": "连接成功消息"
-    },
-    "testTimeout": {
-      "message": "测试超时，请检查网络连接",
-      "description": "测试超时错误消息"
-    },
-    "testFailed": {
-      "message": "测试失败：$error$",
-      "description": "测试失败错误消息",
-      "placeholders": {
-        "error": {
-          "content": "$1",
-          "example": "网络错误"
-        }
-      }
-    },
-    "sidebarOpened": {
-      "message": "侧边栏已打开",
-      "description": "侧边栏已打开消息"
-    },
-    "sidebarNotSupported": {
-      "message": "您的Chrome版本不支持侧边栏",
-      "description": "侧边栏不支持消息"
-    },
-    "openingInNewTab": {
-      "message": "改为在新标签页中打开",
-      "description": "在新标签页中打开消息"
-    },
-    "welcomeTitle": {
-      "message": "欢迎使用Sidebar AI",
-      "description": "欢迎消息标题"
-    },
-    "welcomeMessage": {
-      "message": "问我任何问题，我会帮助您",
-      "description": "欢迎消息文本"
-    },
-    "clearChat": {
-      "message": "清空聊天",
-      "description": "清空聊天按钮标题"
-    },
-    "settings": {
-      "message": "设置",
-      "description": "设置按钮标题"
-    },
-    "typeMessage": {
-      "message": "输入您的消息...",
-      "description": "消息输入占位符"
-    },
-    "openai": {
-      "message": "OpenAI",
-      "description": "OpenAI提供商名称"
-    },
-    "azure": {
-      "message": "Azure",
-      "description": "Azure提供商名称"
-    },
-    "claude": {
-      "message": "Claude",
-      "description": "Claude提供商名称"
-    },
-    "local": {
-      "message": "本地",
-      "description": "本地提供商名称"
-    },
-    "pleaseConfigureApi": {
-      "message": "请在设置中配置API端点",
-      "description": "API未配置错误消息"
-    },
-    "pleaseConfigureModel": {
-      "message": "请在设置中配置模型",
-      "description": "模型未配置错误消息"
-    },
-    "errorMessage": {
-      "message": "错误：$error$",
-      "description": "错误消息",
-      "placeholders": {
-        "error": {
-          "content": "$1",
-          "example": "网络错误"
-        }
-      }
-    },
-    "requestTimeout": {
-      "message": "请求超时，请检查网络或API服务",
-      "description": "请求超时错误消息"
-    }
+  "extension_name": {
+    "message": "侧边栏AI",
+    "description": "扩展名称"
+  },
+  "extension_description": {
+    "message": "在侧边栏中与AI对话",
+    "description": "扩展描述"
+  },
+  "open_ai_chat": {
+    "message": "打开AI聊天",
+    "description": "操作按钮标题"
+  },
+  "ai_chat": {
+    "message": "AI聊天",
+    "description": "头部标题"
+  },
+  "settings": {
+    "message": "设置",
+    "description": "设置面板标题"
+  },
+  "api_endpoint": {
+    "message": "API端点",
+    "description": "API端点标签"
+  },
+  "api_key": {
+    "message": "API密钥",
+    "description": "API密钥标签"
+  },
+  "model": {
+    "message": "模型",
+    "description": "模型选择标签"
+  },
+  "temperature": {
+    "message": "温度 (0-1)",
+    "description": "温度设置标签"
+  },
+  "save_settings": {
+    "message": "保存设置",
+    "description": "保存设置按钮文本"
+  },
+  "enter_message": {
+    "message": "输入消息...",
+    "description": "消息输入框占位符"
+  },
+  "send": {
+    "message": "发送",
+    "description": "发送按钮文本"
+  },
+  "welcome_message": {
+    "message": "你好！我是AI助手，有什么可以帮助你的吗？",
+    "description": "欢迎消息"
+  },
+  "settings_saved": {
+    "message": "设置保存成功",
+    "description": "设置保存成功通知"
+  },
+  "settings_save_failed": {
+    "message": "保存设置失败",
+    "description": "设置保存失败通知"
+  },
+  "api_key_required": {
+    "message": "请先在设置中配置API密钥",
+    "description": "需要API密钥错误消息"
+  },
+  "api_error": {
+    "message": "抱歉，发生错误：",
+    "description": "API错误消息前缀"
+  },
+  "clear_conversation": {
+    "message": "清除对话",
+    "description": "清除对话按钮标题"
+  },
+  "clear_confirm_message": {
+    "message": "确定要清除所有消息吗？",
+    "description": "清除确认消息"
+  },
+  "cancel": {
+    "message": "取消",
+    "description": "取消按钮文本"
+  },
+  "clear": {
+    "message": "清除",
+    "description": "清除按钮文本"
+  },
+  "conversation_cleared": {
+    "message": "对话已清除",
+    "description": "对话清除通知"
   }
+}

@@ -1,225 +1,310 @@
-document.addEventListener('DOMContentLoaded', function() {
-
-  document.getElementById('settingsBtn').title = chrome.i18n.getMessage('settings');
-  document.getElementById('clearBtn').title = chrome.i18n.getMessage('clearChat');
-  document.getElementById('welcomeTitle').textContent = chrome.i18n.getMessage('welcomeTitle');
-  document.getElementById('welcomeMessage').textContent = chrome.i18n.getMessage('welcomeMessage');
-  document.getElementById('messageInput').placeholder = chrome.i18n.getMessage('typeMessage');
+class AIChatSidebar {
+  constructor() {
+    this.defaultSettings = {
+      apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+      apiKey: '',
+      model: 'gpt-3.5-turbo',
+      temperature: 0.7
+    };
+    
+    this.settings = { ...this.defaultSettings };
+    this.isTyping = false;
+    this.currentLocale = chrome.i18n.getUILanguage();
+    
+    this.initializeElements();
+    this.translateUI();
+    this.loadSettings();
+    this.bindEvents();
+  }
   
-  document.getElementById('openaiTag').textContent = chrome.i18n.getMessage('openai');
-  document.getElementById('azureTag').textContent = chrome.i18n.getMessage('azure');
-  document.getElementById('claudeTag').textContent = chrome.i18n.getMessage('claude');
-  document.getElementById('localTag').textContent = chrome.i18n.getMessage('local');
-
-  const chatContainer = document.getElementById('chatContainer');
-  const messageInput = document.getElementById('messageInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const settingsBtn = document.getElementById('settingsBtn');
-  const loading = document.getElementById('loading');
-
-  let conversationHistory = [];
-
-  messageInput.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = (this.scrollHeight) + 'px';
-    if (this.scrollHeight > 120) {
-      this.style.overflowY = 'scroll';
-    } else {
-      this.style.overflowY = 'hidden';
-    }
-  });
-
-  messageInput.addEventListener('input', function() {
-    sendBtn.disabled = !this.value.trim();
-  });
-
-  messageInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (!sendBtn.disabled) {
-        sendMessage();
+  initializeElements() {
+    this.chatContainer = document.getElementById('chatContainer');
+    this.messageInput = document.getElementById('messageInput');
+    this.sendBtn = document.getElementById('sendBtn');
+    this.settingsBtn = document.getElementById('settingsBtn');
+    this.clearBtn = document.getElementById('clearBtn');
+    this.settingsPanel = document.getElementById('settingsPanel');
+    this.closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    this.saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    
+    // 确认对话框元素
+    this.confirmDialog = document.getElementById('confirmDialog');
+    this.cancelClearBtn = document.getElementById('cancelClearBtn');
+    this.confirmClearBtn = document.getElementById('confirmClearBtn');
+    
+    // 设置面板元素
+    this.apiEndpointInput = document.getElementById('apiEndpoint');
+    this.apiKeyInput = document.getElementById('apiKey');
+    this.modelInput = document.getElementById('model');
+    this.temperatureInput = document.getElementById('temperature');
+    this.temperatureValue = document.getElementById('temperatureValue');
+  }
+  
+  translateUI() {
+    // 头部
+    document.getElementById('headerTitle').textContent = chrome.i18n.getMessage('ai_chat');
+    this.clearBtn.title = chrome.i18n.getMessage('clear_conversation');
+    
+    // 聊天区域
+    document.getElementById('welcomeMessage').textContent = chrome.i18n.getMessage('welcome_message');
+    
+    // 输入区域
+    this.messageInput.placeholder = chrome.i18n.getMessage('enter_message');
+    this.sendBtn.textContent = chrome.i18n.getMessage('send');
+    
+    // 设置面板
+    document.getElementById('settingsTitle').textContent = chrome.i18n.getMessage('settings');
+    document.getElementById('apiEndpointLabel').textContent = chrome.i18n.getMessage('api_endpoint');
+    document.getElementById('apiKeyLabel').textContent = chrome.i18n.getMessage('api_key');
+    document.getElementById('modelLabel').textContent = chrome.i18n.getMessage('model');
+    document.getElementById('temperatureLabel').textContent = chrome.i18n.getMessage('temperature');
+    this.saveSettingsBtn.textContent = chrome.i18n.getMessage('save_settings');
+    
+    // 确认对话框
+    document.getElementById('confirmTitle').textContent = chrome.i18n.getMessage('clear_conversation');
+    document.getElementById('confirmMessage').textContent = chrome.i18n.getMessage('clear_confirm_message');
+    document.getElementById('cancelClearBtn').textContent = chrome.i18n.getMessage('cancel');
+    document.getElementById('confirmClearBtn').textContent = chrome.i18n.getMessage('clear');
+    
+    // API端点输入框占位符
+    this.apiEndpointInput.placeholder = 'https://api.openai.com/v1/chat/completions';
+    this.apiKeyInput.placeholder = chrome.i18n.getMessage('api_key');
+    this.modelInput.placeholder = 'gpt-3.5-turbo';
+  }
+  
+  bindEvents() {
+    // 发送消息
+    this.sendBtn.addEventListener('click', () => this.sendMessage());
+    this.messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        this.sendMessage();
       }
-    }
-  });
-
-  sendBtn.addEventListener('click', sendMessage);
-
-  clearBtn.addEventListener('click', function() {
-    showWelcomeMessage();
-    conversationHistory = [];
-  });
-
-  settingsBtn.addEventListener('click', function() {
-    chrome.windows.create({
-      url: chrome.runtime.getURL('popup.html'),
-      type: 'popup',
-      width: 400,
-      height: 600,
-      focused: true
     });
-  });
-
-  function showWelcomeMessage() {
-    chatContainer.innerHTML = `
-      <div class="welcome-message">
-        <div class="welcome-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="icon-robot">
-            <path d="M9 11H15V13H9V11ZM12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H9L3 7V9H5V21H19V9H21ZM7 20V9H9V20H7ZM17 20V9H15V20H17Z" fill="currentColor"/>
-          </svg>
-        </div>
-        <h2>${chrome.i18n.getMessage('welcomeTitle')}</h2>
-        <p>${chrome.i18n.getMessage('welcomeMessage')}</p>
-        <div class="supported-providers">
-          <span class="provider-tag">${chrome.i18n.getMessage('openai')}</span>
-          <span class="provider-tag">${chrome.i18n.getMessage('azure')}</span>
-          <span class="provider-tag">${chrome.i18n.getMessage('claude')}</span>
-          <span class="provider-tag">${chrome.i18n.getMessage('local')}</span>
-        </div>
+    
+    // 设置面板
+    this.settingsBtn.addEventListener('click', () => this.openSettings());
+    this.closeSettingsBtn.addEventListener('click', () => this.closeSettings());
+    this.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
+    
+    // 清除对话
+    this.clearBtn.addEventListener('click', () => this.showClearConfirm());
+    this.cancelClearBtn.addEventListener('click', () => this.hideClearConfirm());
+    this.confirmClearBtn.addEventListener('click', () => this.clearConversation());
+    
+    // 温度滑块
+    this.temperatureInput.addEventListener('input', (e) => {
+      this.temperatureValue.textContent = e.target.value;
+    });
+    
+    // 自动调整输入框高度（支持多行）
+    this.messageInput.addEventListener('input', () => {
+      this.adjustInputHeight();
+    });
+    
+    // 点击对话框外部关闭
+    this.confirmDialog.addEventListener('click', (e) => {
+      if (e.target === this.confirmDialog) {
+        this.hideClearConfirm();
+      }
+    });
+  }
+  
+  adjustInputHeight() {
+    const input = this.messageInput;
+    input.classList.remove('multiline');
+    
+    // 检查是否需要多行
+    if (input.scrollHeight > input.clientHeight) {
+      input.classList.add('multiline');
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    } else {
+      // 保持单行高度
+      input.style.height = '36px';
+    }
+  }
+  
+  async loadSettings() {
+    try {
+      const result = await chrome.storage.sync.get('aiChatSettings');
+      if (result.aiChatSettings) {
+        this.settings = { ...this.defaultSettings, ...result.aiChatSettings };
+      }
+      this.populateSettingsForm();
+    } catch (error) {
+      console.error('加载设置失败:', error);
+    }
+  }
+  
+  populateSettingsForm() {
+    this.apiEndpointInput.value = this.settings.apiEndpoint;
+    this.apiKeyInput.value = this.settings.apiKey;
+    this.modelInput.value = this.settings.model;
+    this.temperatureInput.value = this.settings.temperature;
+    this.temperatureValue.textContent = this.settings.temperature;
+  }
+  
+  async saveSettings() {
+    this.settings = {
+      apiEndpoint: this.apiEndpointInput.value.trim() || this.defaultSettings.apiEndpoint,
+      apiKey: this.apiKeyInput.value.trim(),
+      model: this.modelInput.value.trim() || this.defaultSettings.model,
+      temperature: parseFloat(this.temperatureInput.value)
+    };
+    
+    try {
+      await chrome.storage.sync.set({ aiChatSettings: this.settings });
+      this.closeSettings();
+      this.showNotification(chrome.i18n.getMessage('settings_saved'));
+    } catch (error) {
+      console.error('保存设置失败:', error);
+      this.showNotification(chrome.i18n.getMessage('settings_save_failed'), 'error');
+    }
+  }
+  
+  openSettings() {
+    this.settingsPanel.classList.remove('hidden');
+  }
+  
+  closeSettings() {
+    this.settingsPanel.classList.add('hidden');
+  }
+  
+  showClearConfirm() {
+    this.confirmDialog.classList.remove('hidden');
+  }
+  
+  hideClearConfirm() {
+    this.confirmDialog.classList.add('hidden');
+  }
+  
+  clearConversation() {
+    // 清除其他所有消息
+    const messages = this.chatContainer.querySelectorAll('.message:not(.welcome-message)');
+    messages.forEach(message => message.remove());
+    
+    this.hideClearConfirm();
+    this.showNotification(chrome.i18n.getMessage('conversation_cleared'));
+  }
+  
+  sendMessage() {
+    const message = this.messageInput.value.trim();
+    if (!message || this.isTyping) return;
+    
+    this.addMessage(message, 'user');
+    this.messageInput.value = '';
+    this.messageInput.style.height = '36px';
+    this.messageInput.classList.remove('multiline');
+    this.sendBtn.disabled = true;
+    
+    this.getAIResponse(message);
+  }
+  
+  addMessage(content, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = this.formatMessage(content);
+    
+    messageDiv.appendChild(contentDiv);
+    this.chatContainer.appendChild(messageDiv);
+    
+    // 滚动到底部
+    this.scrollToBottom();
+  }
+  
+  formatMessage(content) {
+    // 格式化
+    return content.replace(/\n/g, '<br>');
+  }
+  
+  async getAIResponse(userMessage) {
+    this.addTypingIndicator();
+    
+    try {
+      const response = await this.callAIAPi(userMessage);
+      this.removeTypingIndicator();
+      this.addMessage(response, 'ai');
+    } catch (error) {
+      this.removeTypingIndicator();
+      this.addMessage(`${chrome.i18n.getMessage('api_error')}${error.message}`, 'ai');
+    }
+    
+    this.sendBtn.disabled = false;
+  }
+  
+  async callAIAPi(message) {
+    if (!this.settings.apiKey) {
+      throw new Error(chrome.i18n.getMessage('api_key_required'));
+    }
+    
+    const response = await fetch(this.settings.apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.settings.apiKey}`
+      },
+      body: JSON.stringify({
+        model: this.settings.model,
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: message }
+        ],
+        temperature: this.settings.temperature
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'API request failed');
+    }
+    
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+  }
+  
+  addTypingIndicator() {
+    this.isTyping = true;
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message ai-message typing-indicator';
+    typingDiv.id = 'typingIndicator';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = `
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     `;
-  }
-
-  async function sendMessage() {
-    const message = messageInput.value.trim();
-    if (!message) return;
-
-    addMessageToChat(message, 'user');
     
-    messageInput.value = '';
-    messageInput.style.height = 'auto';
-    sendBtn.disabled = true;
-
-    loading.style.display = 'flex';
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    try {
-      const config = await new Promise((resolve) => {
-        chrome.storage.sync.get([
-          'apiEndpoint', 
-          'apiKey', 
-          'model'
-        ], resolve);
-      });
-
-      if (!config.apiEndpoint) {
-        throw new Error(chrome.i18n.getMessage('pleaseConfigureApi'));
-      }
-
-      if (!config.model) {
-        throw new Error(chrome.i18n.getMessage('pleaseConfigureModel'));
-      }
-
-      conversationHistory.push({
-        role: 'user',
-        content: message
-      });
-
-      const response = await callGenericAI(
-        config.apiEndpoint,
-        config.apiKey,
-        config.model,
-        conversationHistory
-      );
-      
-      addMessageToChat(response, 'ai');
-      
-      conversationHistory.push({
-        role: 'assistant',
-        content: response
-      });
-
-    } catch (error) {
-      addMessageToChat(chrome.i18n.getMessage('errorMessage', [error.message]), 'ai');
-    } finally {
-      loading.style.display = 'none';
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+    typingDiv.appendChild(contentDiv);
+    this.chatContainer.appendChild(typingDiv);
+    this.scrollToBottom();
+  }
+  
+  removeTypingIndicator() {
+    this.isTyping = false;
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+      typingIndicator.remove();
     }
   }
-
-  function addMessageToChat(message, sender) {
-    const welcomeMessage = chatContainer.querySelector('.welcome-message');
-    if (welcomeMessage) {
-      welcomeMessage.remove();
-    }
-
-    const messageElement = document.createElement('div');
-    messageElement.className = `message ${sender}-message`;
-    messageElement.textContent = message;
-    chatContainer.appendChild(messageElement);
-    
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+  
+  scrollToBottom() {
+    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
-
-  async function callGenericAI(apiEndpoint, apiKey, model, messages) {
-    let endpoint = apiEndpoint;
-    let requestBody = {
-      model: model,
-      messages: messages
-    };
-
-    if (endpoint.includes('azure.com') && !endpoint.includes('chat/completions')) {
-      if (!endpoint.endsWith('/chat/completions')) {
-        endpoint = endpoint + (endpoint.endsWith('/') ? '' : '/') + 'chat/completions';
-      }
-      if (!endpoint.includes('api-version=')) {
-        endpoint += (endpoint.includes('?') ? '&' : '?') + 'api-version=2023-05-15';
-      }
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          ...(endpoint.includes('azure.com') && {
-            'api-key': apiKey
-          })
-        },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.error?.message || errorMessage;
-        } catch (e) {
-          if (errorText) {
-            errorMessage = errorText;
-          }
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      
-      if (data.choices && data.choices.length > 0) {
-        return data.choices[0].message?.content?.trim() || data.choices[0].text?.trim() || '';
-      } else if (data.content) {
-        return data.content.trim();
-      } else {
-        const content = data.text || data.response || data.result || JSON.stringify(data);
-        return content.trim();
-      }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        throw new Error(chrome.i18n.getMessage('requestTimeout'));
-      }
-      throw error;
-    }
+  
+  showNotification(message, type = 'success') {
+    console.log(`${type}: ${message}`);
   }
+}
 
-  showWelcomeMessage();
+// 初始化应用
+document.addEventListener('DOMContentLoaded', () => {
+  new AIChatSidebar();
 });
