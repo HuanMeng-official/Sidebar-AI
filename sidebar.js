@@ -5,11 +5,9 @@ class AIChatSidebar {
       apiKey: '',
       model: 'gemini-2.5-flash',
       temperature: 0.7,
-      apiType: 'gemini'
+      apiType: 'gemini',
+      systemPrompt: 'You are a helpful assistant.'
     };
-
-    this.allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-    this.allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'];
     this.settings = { ...this.defaultSettings };
     this.isTyping = false;
     this.currentLocale = chrome.i18n.getUILanguage();
@@ -18,6 +16,9 @@ class AIChatSidebar {
     this.maxHistoryLength = 50;
     this.attachedFiles = [];
     this.maxFileSize = 10 * 1024 * 1024;
+    this.allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    this.allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'];
+    this.isFetchingPageContent = false;
 
     this.initializeElements();
     this.translateUI();
@@ -51,6 +52,7 @@ class AIChatSidebar {
     this.temperatureInput = document.getElementById('temperature');
     this.temperatureValue = document.getElementById('temperatureValue');
     this.apiTypeSelect = document.getElementById('apiType');
+    this.systemPromptInput = document.getElementById('systemPrompt');
     this.historyList = document.getElementById('historyList');
     this.attachBtn = document.getElementById('attachBtn');
     this.fileInput = document.getElementById('fileInput');
@@ -59,10 +61,7 @@ class AIChatSidebar {
     this.filePreviewContainer = document.getElementById('filePreviewContainer');
     this.filePreviewList = document.getElementById('filePreviewList');
     this.clearFilesBtn = document.getElementById('clearFilesBtn');
-
-    if (this.fileInput) {
-      this.fileInput.accept = this.allowedMimeTypes.join(',');
-    }
+    this.getPageContentBtn = document.getElementById('getPageContentBtn');
   }
 
   translateUI() {
@@ -73,6 +72,9 @@ class AIChatSidebar {
     if (this.attachBtn) {
         this.attachBtn.title = chrome.i18n.getMessage('attach_file');
     }
+    if (this.getPageContentBtn) {
+        this.getPageContentBtn.title = chrome.i18n.getMessage('get_page_content');
+    }
     this.messageInput.placeholder = chrome.i18n.getMessage('enter_message');
     this.sendBtn.textContent = chrome.i18n.getMessage('send');
 
@@ -80,16 +82,25 @@ class AIChatSidebar {
     document.getElementById('apiEndpointLabel').textContent = chrome.i18n.getMessage('api_endpoint');
     document.getElementById('apiKeyLabel').textContent = chrome.i18n.getMessage('api_key');
     document.getElementById('modelLabel').textContent = chrome.i18n.getMessage('model');
+    if (document.getElementById('systemPromptLabel')) {
+      document.getElementById('systemPromptLabel').textContent = chrome.i18n.getMessage('system_prompt') || 'System Prompt';
+   }
+    if (this.systemPromptInput) {
+      this.systemPromptInput.placeholder = chrome.i18n.getMessage('system_prompt_placeholder') || 'Enter system prompt for the AI';
+    }
     document.getElementById('temperatureLabel').textContent = chrome.i18n.getMessage('temperature');
     if (document.getElementById('apiTypeLabel')) {
        document.getElementById('apiTypeLabel').textContent = chrome.i18n.getMessage('api_type');
     }
     this.saveSettingsBtn.textContent = chrome.i18n.getMessage('save_settings');
+
     document.getElementById('historyTitle').textContent = chrome.i18n.getMessage('chat_history');
+
     document.getElementById('newChatTitle').textContent = chrome.i18n.getMessage('new_chat');
     document.getElementById('newChatMessage').textContent = chrome.i18n.getMessage('new_chat_confirm_message');
     document.getElementById('cancelNewChatBtn').textContent = chrome.i18n.getMessage('cancel');
     document.getElementById('confirmNewChatBtn').textContent = chrome.i18n.getMessage('new_chat');
+
     document.getElementById('clearTitle').textContent = chrome.i18n.getMessage('clear_conversation');
     document.getElementById('clearMessage').textContent = chrome.i18n.getMessage('clear_confirm_message');
     document.getElementById('cancelClearBtn').textContent = chrome.i18n.getMessage('cancel');
@@ -116,6 +127,7 @@ class AIChatSidebar {
     this.historyBtn.addEventListener('click', () => this.openHistory());
     this.newChatBtn.addEventListener('click', () => this.showNewChatConfirm());
     this.clearBtn.addEventListener('click', () => this.showClearConfirm());
+
     this.closeSettingsBtn.addEventListener('click', () => this.closeSettings());
     this.closeHistoryBtn.addEventListener('click', () => this.closeHistory());
     this.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
@@ -124,11 +136,12 @@ class AIChatSidebar {
         this.apiTypeSelect.addEventListener('change', () => this.updateApiDefaults());
     }
 
-
     this.cancelNewChatBtn.addEventListener('click', () => this.hideNewChatConfirm());
     this.confirmNewChatBtn.addEventListener('click', () => this.newChat());
+
     this.cancelClearBtn.addEventListener('click', () => this.hideClearConfirm());
     this.confirmClearBtn.addEventListener('click', () => this.clearCurrentConversation());
+
     this.temperatureInput.addEventListener('input', (e) => {
       this.temperatureValue.textContent = e.target.value;
     });
@@ -181,6 +194,10 @@ class AIChatSidebar {
             this.hideFileUploadArea();
         }
         });
+    }
+
+    if (this.getPageContentBtn) {
+        this.getPageContentBtn.addEventListener('click', () => this.fetchAndSendMessage());
     }
   }
 
@@ -236,7 +253,6 @@ class AIChatSidebar {
       if (this.conversationHistory.length > this.maxHistoryLength) {
         this.conversationHistory = this.conversationHistory.slice(-this.maxHistoryLength);
       }
-
       await chrome.storage.local.set({ conversationHistory: this.conversationHistory });
     } catch (error) {
       console.error('保存对话历史失败:', error);
@@ -249,6 +265,11 @@ class AIChatSidebar {
     this.modelInput.value = this.settings.model;
     this.temperatureInput.value = this.settings.temperature;
     this.temperatureValue.textContent = this.settings.temperature;
+
+    if (this.systemPromptInput) {
+      this.systemPromptInput.value = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
+    }
+
     if (this.apiTypeSelect) {
         this.apiTypeSelect.value = this.settings.apiType || 'gemini';
     }
@@ -259,6 +280,7 @@ class AIChatSidebar {
       apiEndpoint: this.apiEndpointInput.value.trim() || this.defaultSettings.apiEndpoint,
       apiKey: this.apiKeyInput.value.trim(),
       model: this.modelInput.value.trim() || this.defaultSettings.model,
+      systemPrompt: this.systemPromptInput ? (this.systemPromptInput.value.trim() || this.defaultSettings.systemPrompt) : this.defaultSettings.systemPrompt,
       temperature: parseFloat(this.temperatureInput.value),
       apiType: this.apiTypeSelect ? this.apiTypeSelect.value : 'gemini'
     };
@@ -389,15 +411,12 @@ class AIChatSidebar {
     );
 
     await this.saveConversationHistory();
-
     this.renderHistoryList();
-
     this.showNotification(chrome.i18n.getMessage('conversation_deleted'));
   }
 
   loadConversation(conversation) {
     this.clearCurrentConversation();
-
     this.currentConversation = [...conversation.messages];
 
     this.currentConversation.forEach(message => {
@@ -408,12 +427,9 @@ class AIChatSidebar {
   clearCurrentConversation() {
     const messages = this.chatContainer.querySelectorAll('.message');
     messages.forEach(message => message.remove());
-
     this.currentConversation = [];
     this.clearAttachedFiles();
-
     this.hideClearConfirm();
-
     this.showNotification(chrome.i18n.getMessage('conversation_cleared'));
   }
 
@@ -445,7 +461,6 @@ class AIChatSidebar {
     };
 
     this.currentConversation.push(messageItem);
-
     this.addMessageToUI(content, sender, files, true);
   }
 
@@ -635,66 +650,94 @@ class AIChatSidebar {
     }
   }
 
-  updateUploadProgress(percent) {
+  async fetchAndSendMessage() {
+    if (this.isFetchingPageContent || this.isTyping) {
+        console.log("Fetch already in progress or AI is typing.");
+        return;
+    }
+
+    this.isFetchingPageContent = true;
+    let originalBtnText = "";
+    if (this.getPageContentBtn) {
+        originalBtnText = this.getPageContentBtn.textContent;
+        this.getPageContentBtn.textContent = "🔄";
+        this.getPageContentBtn.classList.add('loading');
+        this.getPageContentBtn.disabled = true;
+    }
+
+    try {
+      console.log("Requesting page content from background...");
+      const response = await chrome.runtime.sendMessage({ action: "getPageContent" });
+
+      if (response.success) {
+        const pageData = response.data;
+        console.log("Received page content:", pageData);
+
+        const pageSummaryMessage = `[Current Web Page - Key Information]\nTitle: ${pageData.title}\nURL: ${pageData.url}\nContent:\n${pageData.content}`;
+
+        const currentInput = this.messageInput.value;
+        const separator = currentInput ? "\n\n" : "";
+        this.messageInput.value = currentInput + separator + pageSummaryMessage;
+        this.adjustInputHeight();
+
+        this.showNotification("Key page content added to message input.");
+      } else {
+        const errorMsg = response.error || "Unknown error occurred.";
+        console.error("Failed to get page content:", errorMsg);
+        this.showNotification(`Failed to get page content: ${errorMsg}`, 'error');
+      }
+    } catch (error) {
+      console.error("Error during fetchAndSendMessage:", error);
+      this.showNotification(`Error: ${error.message}`, 'error');
+    } finally {
+      this.isFetchingPageContent = false;
+      if (this.getPageContentBtn) {
+        this.getPageContentBtn.classList.remove('loading');
+        this.getPageContentBtn.disabled = false;
+      }
+    }
   }
 
   renderMarkdown(text) {
     let html = this.escapeHtml(text);
-
     html = this.renderTables(html);
-
     html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-
     html = html.replace(/^(\s*)-\s+(.*)$/gm, '$1<li>$2</li>');
     html = html.replace(/(<li>.*<\/li>)+/gs, '<ul>$&</ul>');
-
     html = html.replace(/^(\s*)\d+\.\s+(.*)$/gm, '$1<li>$2</li>');
     html = html.replace(/(<li>.*<\/li>)+/gs, '<ol>$&</ol>');
-
     html = html.replace(/^###### (.*$)/gm, '<h6>$1</h6>');
     html = html.replace(/^##### (.*$)/gm, '<h5>$1</h5>');
     html = html.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
     html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
     html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
     html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
-
     html = html.replace(/^---$/gm, '<hr>');
-
     html = html.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
-
     html = html.replace(/\n/g, '<br>');
-
     return html;
   }
 
   renderTables(html) {
     const tableRegex = /(\|(?:[^\n]*\|)+\n\|(?:\s*[-:]+\s*\|)+\n(?:\|(?:[^\n]*\|)+\n?)*)/g;
-
     return html.replace(tableRegex, (match) => {
       const lines = match.trim().split('\n');
       if (lines.length < 2) return match;
-
       const headerLine = lines[0];
       const separatorLine = lines[1];
       const headers = headerLine.split('|').filter(cell => cell.trim() !== '');
       const separators = separatorLine.split('|').filter(cell => cell.trim() !== '');
-
       if (headers.length !== separators.length) return match;
-
       let tableHtml = '<table class="markdown-table">';
-
       tableHtml += '<thead><tr>';
       headers.forEach(header => {
         tableHtml += `<th>${this.escapeHtml(header.trim())}</th>`;
       });
       tableHtml += '</tr></thead>';
-
       tableHtml += '<tbody>';
       for (let i = 2; i < lines.length; i++) {
         const rowLine = lines[i];
@@ -708,7 +751,6 @@ class AIChatSidebar {
         }
       }
       tableHtml += '</tbody></table>';
-
       return tableHtml;
     });
   }
@@ -726,11 +768,11 @@ class AIChatSidebar {
 
       this.removeTypingIndicator();
       this.addMessage(response, 'ai');
-       this.clearAttachedFiles();
+      this.clearAttachedFiles();
     } catch (error) {
       this.removeTypingIndicator();
       this.addMessage(`${chrome.i18n.getMessage('api_error')}${error.message}`, 'ai');
-       this.clearAttachedFiles();
+      this.clearAttachedFiles();
     }
 
     this.sendBtn.disabled = false;
@@ -743,6 +785,19 @@ class AIChatSidebar {
 
     try {
       const contents = [];
+    
+      const systemMessageContent = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
+      if (systemMessageContent) {
+        contents.push({
+          role: 'user',
+          parts: [{ text: systemMessageContent }]
+        });
+
+        contents.push({
+          role: 'model',
+          parts: [{ text: "Understood. I will follow these instructions." }]
+        });
+      }
 
       for (const item of this.currentConversation) {
         const contentParts = [];
@@ -822,18 +877,15 @@ class AIChatSidebar {
 
   async prepareFilesForGemini(files) {
     const fileParts = [];
-  
+
     for (const file of files) {
       try {
         if (file.type.startsWith('image/')) {
           const base64DataUrl = await this.fileToBase64(file);
-          const base64Data = base64DataUrl.split(',')[1];
-          const mimeType = file.type;
-  
           fileParts.push({
             inlineData: {
-              mimeType: mimeType,
-              data: base64Data
+              mimeType: file.type,
+              data: base64DataUrl.split(',')[1]
             }
           });
         } else {
@@ -848,7 +900,7 @@ class AIChatSidebar {
         });
       }
     }
-  
+
     return fileParts;
   }
 
@@ -860,13 +912,15 @@ class AIChatSidebar {
       reader.readAsDataURL(file);
     });
   }
+
   async callOpenAIAPI(message) {
     if (!this.settings.apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
 
+    const systemMessageContent = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
     const messages = [
-      { role: 'system', content: 'You are a helpful assistant.' }
+      { role: 'system', content: systemMessageContent }
     ];
 
     for (const item of this.currentConversation) {
@@ -874,17 +928,17 @@ class AIChatSidebar {
 
         if (item.files && item.files.length > 0) {
             const fileInfos = item.files.map(file =>
-            `Attached file: ${file.name} (${this.formatFileSize(file.size)})`
+              `Attached file: ${file.name} (${this.formatFileSize(file.size)})`
             ).join('\n');
             if (fileInfos) {
-            content += (content ? '\n\n' : '') + fileInfos;
+                content += (content ? '\n\n---\n' : '') + fileInfos;
             }
         }
 
         if (content) {
             messages.push({
-            role: item.sender === 'user' ? 'user' : 'assistant',
-            content: content
+                role: item.sender === 'user' ? 'user' : 'assistant',
+                content: content
             });
         }
     }
@@ -902,8 +956,6 @@ class AIChatSidebar {
             if (file.type.startsWith('image/')) {
                 try {
                     const base64DataUrl = await this.fileToBase64(file);
-                    const mimeType = base64DataUrl.split(',')[0].split(':')[1].split(';')[0];
-
                     contentParts.push({
                         type: 'image_url',
                         image_url: {
@@ -936,17 +988,19 @@ class AIChatSidebar {
         }
     }
 
+    const requestBody = {
+        model: this.settings.model,
+        messages: messages,
+        temperature: this.settings.temperature
+    };
+
     const response = await fetch(this.settings.apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.settings.apiKey}`
       },
-      body: JSON.stringify({
-        model: this.settings.model,
-        messages: messages,
-        temperature: this.settings.temperature
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {

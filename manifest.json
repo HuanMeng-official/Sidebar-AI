@@ -7,7 +7,8 @@
   "permissions": [
     "sidePanel",
     "storage",
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -25,5 +26,11 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

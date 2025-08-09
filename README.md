@@ -4,6 +4,24 @@
 
 ## Features
 
+```
+project/
+├── manifest.json
+├── background.js
+├── sidebar.html
+├── sidebar.css
+├── sidebar.js
+├── icons/
+│   ├── icon16.png
+│   ├── icon48.png
+│   └── icon128.png
+├── _locales/
+│   ├── en/
+│   │   └── messages.json
+│   └── zh_CN/
+│       └── messages.json
+```
+
 ### Core Functionality
 - **Sidebar Integration**: Native Chrome sidebar implementation using Manifest V3 Side Panel API
 - **AI Chat Interface**: Real-time conversational AI interactions with streaming responses

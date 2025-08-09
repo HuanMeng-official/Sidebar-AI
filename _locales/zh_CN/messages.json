@@ -35,6 +35,14 @@
     "message": "模型",
     "description": "模型选择标签"
   },
+  "system_prompt": {
+    "message": "系统提示词",
+    "description": "系统提示词设置"
+  },
+  "system_prompt_placeholder": {
+    "message": "输入AI的系统提示词",
+    "description": "系统提示词设置文本框"
+  },
   "temperature": {
     "message": "温度 (0-1)",
     "description": "温度设置标签"
@@ -130,5 +138,9 @@
   "attach_file": {
     "message": "附加文件",
     "description": "附加文件按钮标题"
+  },
+  "get_page_content": {
+    "message": "获取当前页面内容",
+    "description": "获取页面内容按钮标题"
   }
 }

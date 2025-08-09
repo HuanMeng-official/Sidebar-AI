@@ -35,6 +35,14 @@
     "message": "Model",
     "description": "Model selection label"
   },
+  "system_prompt": {
+    "message": "System Prompt",
+    "description": "Label for the system prompt textarea in settings"
+  },
+  "system_prompt_placeholder": {
+    "message": "Enter system prompt for the AI",
+    "description": "Placeholder text for the system prompt textarea"
+  },
   "temperature": {
     "message": "Temperature (0-1)",
     "description": "Temperature setting label"
@@ -130,5 +138,9 @@
   "attach_file": {
     "message": "Attach File",
     "description": "Attach file button title"
+  },
+  "get_page_content": {
+    "message": "Get Current Page Content",
+    "description": "Get page content button title"
   }
 }

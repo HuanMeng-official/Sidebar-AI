@@ -628,6 +628,48 @@ body {
   transform: scale(0.95);
 }
 
+.page-content-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--ios-system-blue);
+  padding: 6px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  flex-shrink: 0;
+}
+
+.page-content-btn:hover {
+  background-color: var(--ios-system-gray5);
+  transform: scale(1.05);
+}
+
+.page-content-btn:active {
+  background-color: var(--ios-system-gray4);
+  transform: scale(0.95);
+}
+
+.page-content-btn:disabled {
+  color: var(--ios-system-gray3);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.page-content-btn.loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1.05); }
+}
+
 .message-input {
   flex: 1;
   height: 36px;
@@ -899,7 +941,8 @@ body {
 }
 
 .setting-item input,
-.setting-item select {
+.setting-item select,
+.setting-item textarea {
   padding: 12px 14px;
   border: 0.5px solid var(--ios-system-gray4);
   border-radius: var(--ios-small-border-radius);
@@ -912,7 +955,8 @@ body {
 }
 
 .setting-item input:focus,
-.setting-item select:focus {
+.setting-item select:focus,
+.setting-item textarea:focus {
   outline: none;
   border-color: var(--ios-system-blue);
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
@@ -934,6 +978,12 @@ body {
   background: var(--ios-system-blue);
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.setting-item textarea {
+  min-height: 60px;
+  resize: vertical;
+  line-height: 1.4;
 }
 
 #temperatureValue {
@@ -1332,7 +1382,8 @@ body {
     font-size: 13px;
   }
   
-  .attach-btn {
+  .attach-btn,
+  .page-content-btn {
     width: 32px;
     height: 32px;
     font-size: 16px;
@@ -1344,6 +1395,17 @@ body {
   
   .file-preview-size {
     font-size: 10px;
+  }
+  
+  .setting-item input,
+  .setting-item select,
+  .setting-item textarea {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .setting-item textarea {
+    min-height: 50px;
   }
 }
 
@@ -1379,12 +1441,14 @@ body {
   .message-input,
   .setting-item input,
   .setting-item select,
+  .setting-item textarea,
   .history-item {
     background-color: var(--ios-tertiary-background);
     border-color: var(--ios-system-gray4);
   }
   
   .ai-message .message-content,
+  .welcome-message .message-content,
   .typing-indicator .message-content {
     background-color: var(--ios-secondary-background);
     border-color: var(--ios-system-gray4);
@@ -1431,5 +1495,9 @@ body {
   
   .file-upload-content {
     background-color: var(--ios-secondary-background);
+  }
+  
+  .setting-item textarea {
+    color: var(--ios-label);
   }
 }
