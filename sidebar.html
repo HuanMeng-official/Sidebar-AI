@@ -38,8 +38,16 @@
       
       <div class="settings-content">
         <div class="setting-item">
+          <label for="apiType" id="apiTypeLabel">API Type</label>
+          <select id="apiType">
+            <option value="gemini">Google Gemini</option>
+            <option value="openai">OpenAI</option>
+          </select>
+        </div>
+        
+        <div class="setting-item">
           <label for="apiEndpoint" id="apiEndpointLabel">API Endpoint</label>
-          <input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+          <input type="text" id="apiEndpoint" placeholder="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent">
         </div>
         
         <div class="setting-item">
@@ -49,7 +57,7 @@
         
         <div class="setting-item">
           <label for="model" id="modelLabel">Model</label>
-          <input type="text" id="model" placeholder="gpt-3.5-turbo" value="gpt-3.5-turbo">
+          <input type="text" id="model" placeholder="gemini-2.5-flash" value="gemini-2.5-flash">
         </div>
         
         <div class="setting-item">

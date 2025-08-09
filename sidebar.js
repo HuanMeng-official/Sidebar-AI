@@ -1,10 +1,11 @@
 class AIChatSidebar {
   constructor() {
     this.defaultSettings = {
-      apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+      apiEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
       apiKey: '',
-      model: 'gpt-3.5-turbo',
-      temperature: 0.7
+      model: 'gemini-2.5-flash',
+      temperature: 0.7,
+      apiType: 'gemini'
     };
     
     this.settings = { ...this.defaultSettings };
@@ -48,6 +49,7 @@ class AIChatSidebar {
     this.modelInput = document.getElementById('model');
     this.temperatureInput = document.getElementById('temperature');
     this.temperatureValue = document.getElementById('temperatureValue');
+    this.apiTypeSelect = document.getElementById('apiType');
     
     this.historyList = document.getElementById('historyList');
   }
@@ -66,6 +68,7 @@ class AIChatSidebar {
     document.getElementById('apiKeyLabel').textContent = chrome.i18n.getMessage('api_key');
     document.getElementById('modelLabel').textContent = chrome.i18n.getMessage('model');
     document.getElementById('temperatureLabel').textContent = chrome.i18n.getMessage('temperature');
+    document.getElementById('apiTypeLabel').textContent = chrome.i18n.getMessage('api_type');
     this.saveSettingsBtn.textContent = chrome.i18n.getMessage('save_settings');
     
     document.getElementById('historyTitle').textContent = chrome.i18n.getMessage('chat_history');
@@ -100,6 +103,10 @@ class AIChatSidebar {
     
     this.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
     
+    if (this.apiTypeSelect) {
+      this.apiTypeSelect.addEventListener('change', () => this.updateApiDefaults());
+    }
+    
     this.cancelNewChatBtn.addEventListener('click', () => this.hideNewChatConfirm());
     this.confirmNewChatBtn.addEventListener('click', () => this.newChat());
     
@@ -125,6 +132,17 @@ class AIChatSidebar {
         this.hideClearConfirm();
       }
     });
+  }
+  
+  updateApiDefaults() {
+    const apiType = this.apiTypeSelect.value;
+    if (apiType === 'gemini') {
+      this.apiEndpointInput.value = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+      this.modelInput.value = 'gemini-2.5-flash';
+    } else {
+      this.apiEndpointInput.value = 'https://api.openai.com/v1/chat/completions';
+      this.modelInput.value = 'gpt-5';
+    }
   }
   
   adjustInputHeight() {
@@ -181,6 +199,9 @@ class AIChatSidebar {
     this.modelInput.value = this.settings.model;
     this.temperatureInput.value = this.settings.temperature;
     this.temperatureValue.textContent = this.settings.temperature;
+    if (this.apiTypeSelect) {
+      this.apiTypeSelect.value = this.settings.apiType || 'gemini';
+    }
   }
   
   async saveSettings() {
@@ -188,7 +209,8 @@ class AIChatSidebar {
       apiEndpoint: this.apiEndpointInput.value.trim() || this.defaultSettings.apiEndpoint,
       apiKey: this.apiKeyInput.value.trim(),
       model: this.modelInput.value.trim() || this.defaultSettings.model,
-      temperature: parseFloat(this.temperatureInput.value)
+      temperature: parseFloat(this.temperatureInput.value),
+      apiType: this.apiTypeSelect ? this.apiTypeSelect.value : 'gemini'
     };
     
     try {
@@ -325,7 +347,6 @@ class AIChatSidebar {
   loadConversation(conversation) {
     this.clearCurrentConversation();
     this.currentConversation = [...conversation.messages];
-    
     this.currentConversation.forEach(message => {
       this.addMessageToUI(message.content, message.sender, false);
     });
@@ -416,7 +437,6 @@ class AIChatSidebar {
       const separatorLine = lines[1];
       const headers = headerLine.split('|').filter(cell => cell.trim() !== '');
       const separators = separatorLine.split('|').filter(cell => cell.trim() !== '');
-      
       if (headers.length !== separators.length) return match;
       
       let tableHtml = '<table class="markdown-table">';
@@ -449,7 +469,12 @@ class AIChatSidebar {
     this.addTypingIndicator();
     
     try {
-      const response = await this.callAIAPi(userMessage);
+      let response;
+      if (this.settings.apiType === 'gemini') {
+        response = await this.callGeminiAPI(userMessage);
+      } else {
+        response = await this.callOpenAIAPI(userMessage);
+      }
       this.removeTypingIndicator();
       this.addMessage(response, 'ai');
     } catch (error) {
@@ -459,8 +484,72 @@ class AIChatSidebar {
     
     this.sendBtn.disabled = false;
   }
+
+  async callGeminiAPI(message) {
+    if (!this.settings.apiKey) {
+      throw new Error(chrome.i18n.getMessage('api_key_required'));
+    }
   
-  async callAIAPi(message) {
+    try {
+      const contents = [];
+      this.currentConversation.forEach(item => {
+        contents.push({
+          role: item.sender === 'user' ? 'user' : 'model',
+          parts: [{ text: item.content }]
+        });
+      });
+      
+      const requestBody = {
+        contents: contents,
+        generationConfig: {
+          temperature: this.settings.temperature,
+          maxOutputTokens: 8192
+        }
+      };
+      
+      const model = this.settings.model || 'gemini-2.5-flash';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.settings.apiKey}`;
+      
+      console.log('Gemini API Request:', url, requestBody);
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Gemini API Error Response:', errorText);
+        throw new Error(`Gemini API Error: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Gemini API Response:', data);
+      
+      if (!data.candidates || data.candidates.length === 0) {
+        throw new Error('No response candidates received from Gemini API');
+      }
+      
+      const candidate = data.candidates[0];
+      if (candidate.finishReason === 'SAFETY') {
+        throw new Error('Response blocked by safety filters');
+      }
+      
+      if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+        throw new Error('Invalid response format from Gemini API');
+      }
+      
+      return candidate.content.parts[0].text.trim();
+    } catch (error) {
+      console.error('Gemini API call failed:', error);
+      throw error;
+    }
+  }
+  
+  async callOpenAIAPI(message) {
     if (!this.settings.apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
@@ -491,7 +580,7 @@ class AIChatSidebar {
     
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'API request failed');
+      throw new Error(errorData.error?.message || 'OpenAI API request failed');
     }
     
     const data = await response.json();

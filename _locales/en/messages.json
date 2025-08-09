@@ -27,6 +27,10 @@
     "message": "API Key",
     "description": "API key label"
   },
+  "api_type": {
+    "message": "API Type",
+    "description": "API type selection label"
+  },
   "model": {
     "message": "Model",
     "description": "Model selection label"

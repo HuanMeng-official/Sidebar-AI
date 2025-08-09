@@ -27,6 +27,10 @@
     "message": "API 密钥",
     "description": "API密钥标签"
   },
+  "api_type": {
+    "message": "API 类型",
+    "description": "API类型选择标签"
+  },
   "model": {
     "message": "模型",
     "description": "模型选择标签"
