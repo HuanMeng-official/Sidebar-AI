@@ -1,3 +1,12 @@
+chrome.runtime.onInstalled.addListener(() => {
+});
+
+chrome.action.onClicked.addListener((tab) => {
+  chrome.sidePanel.open({ windowId: tab.windowId });
+});
+
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("Background received message:", request);
 
