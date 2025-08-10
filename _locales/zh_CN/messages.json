@@ -43,6 +43,10 @@
     "message": "输入AI的系统提示词",
     "description": "系统提示词设置文本框"
   },
+  "show_token_info": {
+    "message": "显示 Token",
+    "description": "显示 Token"
+  },
   "temperature": {
     "message": "温度 (0-1)",
     "description": "温度设置标签"

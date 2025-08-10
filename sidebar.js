@@ -6,7 +6,8 @@ class AIChatSidebar {
       model: 'gemini-2.5-flash',
       temperature: 0.7,
       apiType: 'gemini',
-      systemPrompt: 'You are a helpful assistant.'
+      systemPrompt: 'You are a helpful assistant.',
+      showTokenInfo: false
     };
     this.settings = { ...this.defaultSettings };
     this.isTyping = false;
@@ -52,7 +53,6 @@ class AIChatSidebar {
     this.temperatureInput = document.getElementById('temperature');
     this.temperatureValue = document.getElementById('temperatureValue');
     this.apiTypeSelect = document.getElementById('apiType');
-    this.systemPromptInput = document.getElementById('systemPrompt');
     this.historyList = document.getElementById('historyList');
     this.attachBtn = document.getElementById('attachBtn');
     this.fileInput = document.getElementById('fileInput');
@@ -62,6 +62,8 @@ class AIChatSidebar {
     this.filePreviewList = document.getElementById('filePreviewList');
     this.clearFilesBtn = document.getElementById('clearFilesBtn');
     this.getPageContentBtn = document.getElementById('getPageContentBtn');
+    this.systemPromptInput = document.getElementById('systemPrompt');
+    this.showTokenInfoInput = document.getElementById('showTokenInfo');
   }
 
   translateUI() {
@@ -70,10 +72,10 @@ class AIChatSidebar {
     this.newChatBtn.title = chrome.i18n.getMessage('new_chat');
     this.clearBtn.title = chrome.i18n.getMessage('clear_conversation');
     if (this.attachBtn) {
-        this.attachBtn.title = chrome.i18n.getMessage('attach_file');
+      this.attachBtn.title = chrome.i18n.getMessage('attach_file');
     }
     if (this.getPageContentBtn) {
-        this.getPageContentBtn.title = chrome.i18n.getMessage('get_page_content');
+      this.getPageContentBtn.title = chrome.i18n.getMessage('get_page_content');
     }
     this.messageInput.placeholder = chrome.i18n.getMessage('enter_message');
     this.sendBtn.textContent = chrome.i18n.getMessage('send');
@@ -82,15 +84,9 @@ class AIChatSidebar {
     document.getElementById('apiEndpointLabel').textContent = chrome.i18n.getMessage('api_endpoint');
     document.getElementById('apiKeyLabel').textContent = chrome.i18n.getMessage('api_key');
     document.getElementById('modelLabel').textContent = chrome.i18n.getMessage('model');
-    if (document.getElementById('systemPromptLabel')) {
-      document.getElementById('systemPromptLabel').textContent = chrome.i18n.getMessage('system_prompt') || 'System Prompt';
-   }
-    if (this.systemPromptInput) {
-      this.systemPromptInput.placeholder = chrome.i18n.getMessage('system_prompt_placeholder') || 'Enter system prompt for the AI';
-    }
     document.getElementById('temperatureLabel').textContent = chrome.i18n.getMessage('temperature');
     if (document.getElementById('apiTypeLabel')) {
-       document.getElementById('apiTypeLabel').textContent = chrome.i18n.getMessage('api_type');
+      document.getElementById('apiTypeLabel').textContent = chrome.i18n.getMessage('api_type');
     }
     this.saveSettingsBtn.textContent = chrome.i18n.getMessage('save_settings');
 
@@ -107,10 +103,19 @@ class AIChatSidebar {
     document.getElementById('confirmClearBtn').textContent = chrome.i18n.getMessage('clear');
 
     if (document.getElementById('filePreviewTitle')) {
-        document.getElementById('filePreviewTitle').textContent = chrome.i18n.getMessage('attached_files');
+      document.getElementById('filePreviewTitle').textContent = chrome.i18n.getMessage('attached_files');
     }
     if (this.fileUploadText) {
-        this.fileUploadText.textContent = chrome.i18n.getMessage('drop_files_here') || 'Drop files here or click to upload';
+      this.fileUploadText.textContent = chrome.i18n.getMessage('drop_files_here') || 'Drop files here or click to upload';
+    }
+    if (document.getElementById('systemPromptLabel')) {
+      document.getElementById('systemPromptLabel').textContent = chrome.i18n.getMessage('system_prompt') || 'System Prompt';
+    }
+    if (this.systemPromptInput) {
+      this.systemPromptInput.placeholder = chrome.i18n.getMessage('system_prompt_placeholder') || 'Enter system prompt for the AI...';
+    }
+    if (document.getElementById('showTokenInfoLabel')) {
+      document.getElementById('showTokenInfoLabel').textContent = chrome.i18n.getMessage('show_token_info') || 'Show Token Info';
     }
   }
 
@@ -133,7 +138,7 @@ class AIChatSidebar {
     this.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
 
     if (this.apiTypeSelect) {
-        this.apiTypeSelect.addEventListener('change', () => this.updateApiDefaults());
+      this.apiTypeSelect.addEventListener('change', () => this.updateApiDefaults());
     }
 
     this.cancelNewChatBtn.addEventListener('click', () => this.hideNewChatConfirm());
@@ -162,42 +167,42 @@ class AIChatSidebar {
     });
 
     if (this.attachBtn) {
-        this.attachBtn.addEventListener('click', () => this.openFileSelector());
+      this.attachBtn.addEventListener('click', () => this.openFileSelector());
     }
     if (this.fileInput) {
-        this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+      this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
     }
     if (this.clearFilesBtn) {
-        this.clearFilesBtn.addEventListener('click', () => this.clearAttachedFiles());
+      this.clearFilesBtn.addEventListener('click', () => this.clearAttachedFiles());
     }
 
     if (this.fileUploadArea) {
-        this.fileUploadArea.addEventListener('dragover', (e) => {
+      this.fileUploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         this.fileUploadArea.classList.add('drag-over');
-        });
+      });
 
-        this.fileUploadArea.addEventListener('dragleave', () => {
+      this.fileUploadArea.addEventListener('dragleave', () => {
         this.fileUploadArea.classList.remove('drag-over');
-        });
+      });
 
-        this.fileUploadArea.addEventListener('drop', (e) => {
+      this.fileUploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
         this.fileUploadArea.classList.remove('drag-over');
         if (e.dataTransfer.files.length) {
-            this.handleFiles(Array.from(e.dataTransfer.files));
+          this.handleFiles(Array.from(e.dataTransfer.files));
         }
-        });
+      });
 
-        this.fileUploadArea.addEventListener('click', (e) => {
+      this.fileUploadArea.addEventListener('click', (e) => {
         if (e.target === this.fileUploadArea) {
-            this.hideFileUploadArea();
+          this.hideFileUploadArea();
         }
-        });
+      });
     }
 
     if (this.getPageContentBtn) {
-        this.getPageContentBtn.addEventListener('click', () => this.fetchAndSendMessage());
+      this.getPageContentBtn.addEventListener('click', () => this.fetchAndSendMessage());
     }
   }
 
@@ -265,13 +270,14 @@ class AIChatSidebar {
     this.modelInput.value = this.settings.model;
     this.temperatureInput.value = this.settings.temperature;
     this.temperatureValue.textContent = this.settings.temperature;
-
+    if (this.apiTypeSelect) {
+      this.apiTypeSelect.value = this.settings.apiType || 'gemini';
+    }
     if (this.systemPromptInput) {
       this.systemPromptInput.value = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
     }
-
-    if (this.apiTypeSelect) {
-        this.apiTypeSelect.value = this.settings.apiType || 'gemini';
+    if (this.showTokenInfoInput) {
+      this.showTokenInfoInput.checked = this.settings.showTokenInfo || false;
     }
   }
 
@@ -280,9 +286,10 @@ class AIChatSidebar {
       apiEndpoint: this.apiEndpointInput.value.trim() || this.defaultSettings.apiEndpoint,
       apiKey: this.apiKeyInput.value.trim(),
       model: this.modelInput.value.trim() || this.defaultSettings.model,
-      systemPrompt: this.systemPromptInput ? (this.systemPromptInput.value.trim() || this.defaultSettings.systemPrompt) : this.defaultSettings.systemPrompt,
       temperature: parseFloat(this.temperatureInput.value),
-      apiType: this.apiTypeSelect ? this.apiTypeSelect.value : 'gemini'
+      apiType: this.apiTypeSelect ? this.apiTypeSelect.value : 'gemini',
+      systemPrompt: this.systemPromptInput ? (this.systemPromptInput.value.trim() || this.defaultSettings.systemPrompt) : this.defaultSettings.systemPrompt,
+      showTokenInfo: this.showTokenInfoInput ? this.showTokenInfoInput.checked : false
     };
 
     try {
@@ -420,7 +427,7 @@ class AIChatSidebar {
     this.currentConversation = [...conversation.messages];
 
     this.currentConversation.forEach(message => {
-        this.addMessageToUI(message.content, message.sender, message.files || [], false);
+      this.addMessageToUI(message.content, message.sender, message.files || [], false);
     });
   }
 
@@ -433,7 +440,7 @@ class AIChatSidebar {
     this.showNotification(chrome.i18n.getMessage('conversation_cleared'));
   }
 
-  async sendMessage() {
+  sendMessage() {
     const message = this.messageInput.value.trim();
 
     if ((!message && this.attachedFiles.length === 0) || this.isTyping) return;
@@ -464,10 +471,10 @@ class AIChatSidebar {
     this.addMessageToUI(content, sender, files, true);
   }
 
-  addMessageToUI(content, sender, files = [], isNewMessage = true) {
+  addMessageToUI(content, sender, files = [], isNewMessage = true, tokens = null) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
-
+    messageDiv.dataset.sender = sender;
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
 
@@ -508,195 +515,38 @@ class AIChatSidebar {
     }
 
     messageDiv.appendChild(contentDiv);
-    this.chatContainer.appendChild(messageDiv);
 
+    if (this.settings.showTokenInfo && tokens) {
+      const tokenInfoDiv = document.createElement('div');
+      tokenInfoDiv.className = 'token-info';
+
+      let tokenText = '';
+      if (tokens.inputTokens !== undefined) {
+        tokenText += `In: ${tokens.inputTokens} tokens`;
+      }
+      if (tokens.outputTokens !== undefined) {
+        tokenText += tokenText ? ', ' : '';
+        tokenText += `Out: ${tokens.outputTokens} tokens`;
+      }
+      if (tokens.timeTakenMs !== undefined && tokens.outputTokens !== undefined && tokens.outputTokens > 0) {
+        const timeInSeconds = tokens.timeTakenMs / 1000;
+        if (timeInSeconds > 0) {
+          const tokensPerSecond = (tokens.outputTokens / timeInSeconds).toFixed(2);
+          tokenText += tokenText ? `, ` : '';
+          tokenText += `Sed: ${tokensPerSecond} T/s`;
+        }
+      }
+
+      if (tokenText) {
+        tokenInfoDiv.textContent = tokenText;
+        contentDiv.appendChild(tokenInfoDiv);
+      }
+    }
+
+    this.chatContainer.appendChild(messageDiv);
     this.scrollToBottom();
   }
 
-  openFileSelector() {
-    if (this.fileInput) {
-        this.fileInput.click();
-    }
-  }
-
-  handleFileSelect(event) {
-    const files = Array.from(event.target.files);
-    this.handleFiles(files);
-    this.fileInput.value = '';
-  }
-
-  handleFiles(files) {
-    files.forEach(file => {
-      const isAllowedType = this.allowedMimeTypes.includes(file.type);
-      const isAllowedExtension = this.allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-
-      if (!isAllowedType && !isAllowedExtension) {
-        this.showNotification(`File ${file.name} is not an allowed image type.`, 'error');
-        return;
-      }
-
-      if (file.size > this.maxFileSize) {
-        this.showNotification(`File ${file.name} is too large (max 10MB)`, 'error');
-        return;
-      }
-
-      const existingFile = this.attachedFiles.find(f =>
-        f.name === file.name && f.size === file.size
-      );
-
-      if (!existingFile) {
-        this.attachedFiles.push(file);
-      }
-    });
-
-    this.updateFilePreview();
-    this.hideFileUploadArea();
-  }
-
-  updateFilePreview() {
-    if (this.attachedFiles.length === 0) {
-        if (this.filePreviewContainer) {
-            this.filePreviewContainer.classList.add('hidden');
-        }
-      return;
-    }
-
-    if (this.filePreviewContainer) {
-        this.filePreviewContainer.classList.remove('hidden');
-    }
-    if (this.filePreviewList) {
-        this.filePreviewList.innerHTML = '';
-    }
-
-    this.attachedFiles.forEach((file, index) => {
-      const fileItem = document.createElement('div');
-      fileItem.className = 'file-preview-item';
-
-      let icon = '📄';
-      if (file.type.startsWith('image/')) {
-        icon = '🖼️';
-      }
-
-      const fileSize = this.formatFileSize(file.size);
-
-      fileItem.innerHTML = `
-        <span class="file-preview-icon">${icon}</span>
-        <div class="file-preview-info">
-          <div class="file-preview-name" title="${file.name}">${file.name}</div>
-          <div class="file-preview-size">${fileSize}</div>
-        </div>
-        <button class="file-preview-remove" data-index="${index}">×</button>
-      `;
-
-      const removeBtn = fileItem.querySelector('.file-preview-remove');
-      if (removeBtn) {
-          removeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.removeAttachedFile(index);
-          });
-      }
-
-      if (this.filePreviewList) {
-          this.filePreviewList.appendChild(fileItem);
-      }
-    });
-  }
-
-  removeAttachedFile(index) {
-    this.attachedFiles.splice(index, 1);
-    this.updateFilePreview();
-  }
-
-  clearAttachedFiles() {
-    this.attachedFiles = [];
-    this.updateFilePreview();
-  }
-
-  formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  showFileUploadArea() {
-    if (this.fileUploadArea) {
-        this.fileUploadArea.classList.remove('hidden');
-    }
-    if (this.fileUploadText) {
-        this.fileUploadText.textContent = chrome.i18n.getMessage('drop_files_here') || 'Drop files here or click to upload';
-    }
-    this.hideFileUploadProgress();
-  }
-
-  hideFileUploadArea() {
-    if (this.fileUploadArea) {
-        this.fileUploadArea.classList.add('hidden');
-    }
-  }
-
-  showFileUploadProgress() {
-    const progressContainer = document.querySelector('.file-upload-progress');
-    if (progressContainer) {
-        progressContainer.classList.remove('hidden');
-    }
-  }
-
-  hideFileUploadProgress() {
-    const progressContainer = document.querySelector('.file-upload-progress');
-    if (progressContainer) {
-        progressContainer.classList.add('hidden');
-    }
-  }
-
-  async fetchAndSendMessage() {
-    if (this.isFetchingPageContent || this.isTyping) {
-        console.log("Fetch already in progress or AI is typing.");
-        return;
-    }
-
-    this.isFetchingPageContent = true;
-    let originalBtnText = "";
-    if (this.getPageContentBtn) {
-        originalBtnText = this.getPageContentBtn.textContent;
-        this.getPageContentBtn.textContent = "🔄";
-        this.getPageContentBtn.classList.add('loading');
-        this.getPageContentBtn.disabled = true;
-    }
-
-    try {
-      console.log("Requesting page content from background...");
-      const response = await chrome.runtime.sendMessage({ action: "getPageContent" });
-
-      if (response.success) {
-        const pageData = response.data;
-        console.log("Received page content:", pageData);
-
-        const pageSummaryMessage = `[Current Web Page - Key Information]\nTitle: ${pageData.title}\nURL: ${pageData.url}\nContent:\n${pageData.content}`;
-
-        const currentInput = this.messageInput.value;
-        const separator = currentInput ? "\n\n" : "";
-        this.messageInput.value = currentInput + separator + pageSummaryMessage;
-        this.adjustInputHeight();
-
-        this.showNotification("Key page content added to message input.");
-      } else {
-        const errorMsg = response.error || "Unknown error occurred.";
-        console.error("Failed to get page content:", errorMsg);
-        this.showNotification(`Failed to get page content: ${errorMsg}`, 'error');
-      }
-    } catch (error) {
-      console.error("Error during fetchAndSendMessage:", error);
-      this.showNotification(`Error: ${error.message}`, 'error');
-    } finally {
-      this.isFetchingPageContent = false;
-      if (this.getPageContentBtn) {
-        this.getPageContentBtn.classList.remove('loading');
-        this.getPageContentBtn.disabled = false;
-      }
-    }
-  }
 
   renderMarkdown(text) {
     let html = this.escapeHtml(text);
@@ -724,14 +574,18 @@ class AIChatSidebar {
 
   renderTables(html) {
     const tableRegex = /(\|(?:[^\n]*\|)+\n\|(?:\s*[-:]+\s*\|)+\n(?:\|(?:[^\n]*\|)+\n?)*)/g;
+
     return html.replace(tableRegex, (match) => {
       const lines = match.trim().split('\n');
       if (lines.length < 2) return match;
+
       const headerLine = lines[0];
       const separatorLine = lines[1];
       const headers = headerLine.split('|').filter(cell => cell.trim() !== '');
       const separators = separatorLine.split('|').filter(cell => cell.trim() !== '');
+
       if (headers.length !== separators.length) return match;
+
       let tableHtml = '<table class="markdown-table">';
       tableHtml += '<thead><tr>';
       headers.forEach(header => {
@@ -758,20 +612,37 @@ class AIChatSidebar {
   async getAIResponse(userMessage) {
     this.addTypingIndicator();
 
+    const startTime = performance.now();
+
     try {
       let response;
+      let tokens = { inputTokens: 0, outputTokens: 0, timeTakenMs: 0 };
+
       if (this.settings.apiType === 'gemini') {
-        response = await this.callGeminiAPI(userMessage);
+        const result = await this.callGeminiAPI(userMessage);
+        response = result.text;
+        tokens = { ...tokens, ...result.tokens };
       } else {
-        response = await this.callOpenAIAPI(userMessage);
+        const result = await this.callOpenAIAPI(userMessage);
+        response = result.text;
+        tokens = { ...tokens, ...result.tokens };
       }
 
+      const endTime = performance.now();
+      tokens.timeTakenMs = endTime - startTime;
+
       this.removeTypingIndicator();
-      this.addMessage(response, 'ai');
+      if (this.currentConversation.length > 0) {
+        const lastMessage = this.currentConversation[this.currentConversation.length - 1];
+        if (lastMessage.sender === 'ai') {
+          lastMessage.tokens = tokens;
+        }
+      }
+      this.addMessageToUI(response, 'ai', [], true, tokens);
       this.clearAttachedFiles();
     } catch (error) {
       this.removeTypingIndicator();
-      this.addMessage(`${chrome.i18n.getMessage('api_error')}${error.message}`, 'ai');
+      this.addMessageToUI(`${chrome.i18n.getMessage('api_error')}${error.message}`, 'ai', [], true, null);
       this.clearAttachedFiles();
     }
 
@@ -785,14 +656,13 @@ class AIChatSidebar {
 
     try {
       const contents = [];
-    
+
       const systemMessageContent = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
       if (systemMessageContent) {
         contents.push({
           role: 'user',
           parts: [{ text: systemMessageContent }]
         });
-
         contents.push({
           role: 'model',
           parts: [{ text: "Understood. I will follow these instructions." }]
@@ -815,13 +685,13 @@ class AIChatSidebar {
 
       if (this.attachedFiles.length > 0) {
         const fileParts = await this.prepareFilesForGemini(this.attachedFiles);
-        if (contents.length > 0) {
-            contents[contents.length - 1].parts.push(...fileParts);
+        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+          contents[contents.length - 1].parts.push(...fileParts);
         } else {
-            contents.push({
-                role: 'user',
-                parts: fileParts
-            });
+          contents.push({
+            role: 'user',
+            parts: fileParts
+          });
         }
       }
 
@@ -868,12 +738,137 @@ class AIChatSidebar {
         throw new Error('Invalid response format from Gemini API');
       }
 
-      return candidate.content.parts[0].text.trim();
+      let inputTokens = 0;
+      let outputTokens = 0;
+      if (data.usageMetadata) {
+        inputTokens = data.usageMetadata.promptTokenCount || 0;
+        outputTokens = data.usageMetadata.candidatesTokenCount || 0;
+      }
+
+      return {
+        text: candidate.content.parts[0].text.trim(),
+        tokens: { inputTokens, outputTokens }
+      };
     } catch (error) {
       console.error('Gemini API call failed:', error);
       throw error;
     }
   }
+
+  async callOpenAIAPI(message) {
+    if (!this.settings.apiKey) {
+      throw new Error(chrome.i18n.getMessage('api_key_required'));
+    }
+
+    const systemMessageContent = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
+    const messages = [
+      { role: 'system', content: systemMessageContent }
+    ];
+
+    for (const item of this.currentConversation) {
+      let content = item.content || '';
+
+      if (item.files && item.files.length > 0) {
+        const fileInfos = item.files.map(file =>
+          `Attached file: ${file.name} (${this.formatFileSize(file.size)})`
+        ).join('\n');
+        if (fileInfos) {
+          content += (content ? '\n\n' : '') + fileInfos;
+        }
+      }
+
+      if (content) {
+        messages.push({
+          role: item.sender === 'user' ? 'user' : 'assistant',
+          content: content
+        });
+      }
+    }
+
+    let currentUserMessageContent = message || '';
+
+    if (this.attachedFiles.length > 0) {
+      const contentParts = [];
+
+      if (currentUserMessageContent.trim()) {
+        contentParts.push({ type: 'text', text: currentUserMessageContent });
+      }
+
+      for (const file of this.attachedFiles) {
+        if (file.type.startsWith('image/')) {
+          try {
+            const base64DataUrl = await this.fileToBase64(file);
+            contentParts.push({
+              type: 'image_url',
+              image_url: {
+                url: base64DataUrl
+              }
+            });
+          } catch (error) {
+            console.error('Error processing image file for OpenAI:', file.name, error);
+            contentParts.push({ type: 'text', text: `[Error reading image: ${file.name}]` });
+          }
+        } else {
+          contentParts.push({
+            type: 'text',
+            text: `Attached file (not an image): ${file.name} (${this.formatFileSize(file.size)})`
+          });
+        }
+      }
+
+      messages.push({
+        role: 'user',
+        content: contentParts
+      });
+
+    } else {
+      if (currentUserMessageContent.trim()) {
+        messages.push({
+          role: 'user',
+          content: currentUserMessageContent
+        });
+      }
+    }
+
+    const response = await fetch(this.settings.apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.settings.apiKey}`
+      },
+      body: JSON.stringify({
+        model: this.settings.model,
+        messages: messages,
+        temperature: this.settings.temperature
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.error?.message || `OpenAI API request failed: ${response.status} ${response.statusText}`;
+      console.error('OpenAI API Error Response:', errorData);
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+
+    let inputTokens = 0;
+    let outputTokens = 0;
+    if (data.usage) {
+      inputTokens = data.usage.prompt_tokens || 0;
+      outputTokens = data.usage.completion_tokens || 0;
+    }
+
+    if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
+      throw new Error('Invalid response format from OpenAI API');
+    }
+
+    return {
+      text: data.choices[0].message.content.trim(),
+      tokens: { inputTokens, outputTokens }
+    };
+  }
+
 
   async prepareFilesForGemini(files) {
     const fileParts = [];
@@ -913,115 +908,8 @@ class AIChatSidebar {
     });
   }
 
-  async callOpenAIAPI(message) {
-    if (!this.settings.apiKey) {
-      throw new Error(chrome.i18n.getMessage('api_key_required'));
-    }
-
-    const systemMessageContent = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
-    const messages = [
-      { role: 'system', content: systemMessageContent }
-    ];
-
-    for (const item of this.currentConversation) {
-        let content = item.content || '';
-
-        if (item.files && item.files.length > 0) {
-            const fileInfos = item.files.map(file =>
-              `Attached file: ${file.name} (${this.formatFileSize(file.size)})`
-            ).join('\n');
-            if (fileInfos) {
-                content += (content ? '\n\n---\n' : '') + fileInfos;
-            }
-        }
-
-        if (content) {
-            messages.push({
-                role: item.sender === 'user' ? 'user' : 'assistant',
-                content: content
-            });
-        }
-    }
-
-    let currentUserMessageContent = message || '';
-
-    if (this.attachedFiles.length > 0) {
-        const contentParts = [];
-
-        if (currentUserMessageContent.trim()) {
-            contentParts.push({ type: 'text', text: currentUserMessageContent });
-        }
-
-        for (const file of this.attachedFiles) {
-            if (file.type.startsWith('image/')) {
-                try {
-                    const base64DataUrl = await this.fileToBase64(file);
-                    contentParts.push({
-                        type: 'image_url',
-                        image_url: {
-                            url: base64DataUrl
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error processing image file for OpenAI:', file.name, error);
-                    contentParts.push({ type: 'text', text: `[Error reading image: ${file.name}]` });
-                }
-            } else {
-                contentParts.push({
-                    type: 'text',
-                    text: `Attached file (not an image): ${file.name} (${this.formatFileSize(file.size)})`
-                });
-            }
-        }
-
-        messages.push({
-            role: 'user',
-            content: contentParts
-        });
-
-    } else {
-        if (currentUserMessageContent.trim()) {
-            messages.push({
-                role: 'user',
-                content: currentUserMessageContent
-            });
-        }
-    }
-
-    const requestBody = {
-        model: this.settings.model,
-        messages: messages,
-        temperature: this.settings.temperature
-    };
-
-    const response = await fetch(this.settings.apiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.settings.apiKey}`
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const errorMessage = errorData.error?.message || `OpenAI API request failed: ${response.status} ${response.statusText}`;
-      console.error('OpenAI API Error Response:', errorData);
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-
-    if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
-        throw new Error('Invalid response format from OpenAI API');
-    }
-
-    return data.choices[0].message.content.trim();
-  }
-
   addTypingIndicator() {
     this.isTyping = true;
-
     const typingDiv = document.createElement('div');
     typingDiv.className = 'message ai-message typing-indicator';
     typingDiv.id = 'typingIndicator';
@@ -1055,6 +943,207 @@ class AIChatSidebar {
 
   showNotification(message, type = 'success') {
     console.log(`${type}: ${message}`);
+  }
+
+  openFileSelector() {
+    if (this.fileInput) {
+      this.fileInput.click();
+    }
+  }
+
+  handleFileSelect(event) {
+    const files = Array.from(event.target.files);
+    this.handleFiles(files);
+    this.fileInput.value = '';
+  }
+
+  handleFiles(files) {
+    files.forEach(file => {
+      const isAllowedType = this.allowedMimeTypes.includes(file.type);
+      const isAllowedExtension = this.allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+
+      if (!isAllowedType && !isAllowedExtension) {
+        this.showNotification(`File ${file.name} is not an allowed image type.`, 'error');
+        return;
+      }
+
+      if (file.size > this.maxFileSize) {
+        this.showNotification(`File ${file.name} is too large (max 10MB)`, 'error');
+        return;
+      }
+
+      const existingFile = this.attachedFiles.find(f =>
+        f.name === file.name && f.size === file.size
+      );
+
+      if (!existingFile) {
+        this.attachedFiles.push(file);
+      }
+    });
+
+    this.updateFilePreview();
+    this.hideFileUploadArea();
+  }
+
+  updateFilePreview() {
+    if (this.attachedFiles.length === 0) {
+      if (this.filePreviewContainer) {
+        this.filePreviewContainer.classList.add('hidden');
+      }
+      return;
+    }
+
+    if (this.filePreviewContainer) {
+      this.filePreviewContainer.classList.remove('hidden');
+    }
+    if (this.filePreviewList) {
+      this.filePreviewList.innerHTML = '';
+    }
+
+    this.attachedFiles.forEach((file, index) => {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-preview-item';
+
+      let icon = '📄';
+      if (file.type.startsWith('image/')) {
+        icon = '🖼️';
+      }
+
+      const fileSize = this.formatFileSize(file.size);
+
+      fileItem.innerHTML = `
+        <span class="file-preview-icon">${icon}</span>
+        <div class="file-preview-info">
+          <div class="file-preview-name" title="${file.name}">${file.name}</div>
+          <div class="file-preview-size">${fileSize}</div>
+        </div>
+        <button class="file-preview-remove" data-index="${index}">×</button>
+      `;
+
+      const removeBtn = fileItem.querySelector('.file-preview-remove');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.removeAttachedFile(index);
+        });
+      }
+
+      if (this.filePreviewList) {
+        this.filePreviewList.appendChild(fileItem);
+      }
+    });
+  }
+
+  removeAttachedFile(index) {
+    this.attachedFiles.splice(index, 1);
+    this.updateFilePreview();
+  }
+
+  clearAttachedFiles() {
+    this.attachedFiles = [];
+    this.updateFilePreview();
+  }
+
+  formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  showFileUploadArea() {
+    if (this.fileUploadArea) {
+      this.fileUploadArea.classList.remove('hidden');
+    }
+    if (this.fileUploadText) {
+      this.fileUploadText.textContent = chrome.i18n.getMessage('drop_files_here') || 'Drop files here or click to upload';
+    }
+    this.hideFileUploadProgress();
+  }
+
+  hideFileUploadArea() {
+    if (this.fileUploadArea) {
+      this.fileUploadArea.classList.add('hidden');
+    }
+  }
+
+  showFileUploadProgress() {
+    const progressContainer = document.querySelector('.file-upload-progress');
+    if (progressContainer) {
+      progressContainer.classList.remove('hidden');
+    }
+  }
+
+  hideFileUploadProgress() {
+    const progressContainer = document.querySelector('.file-upload-progress');
+    if (progressContainer) {
+      progressContainer.classList.add('hidden');
+    }
+  }
+
+  updateUploadProgress(percent) {
+    if (this.progressFill) {
+      this.progressFill.style.width = percent + '%';
+    }
+    if (this.progressText) {
+      this.progressText.textContent = percent + '%';
+    }
+  }
+
+  async fetchAndSendMessage() {
+    if (this.isFetchingPageContent || this.isTyping) {
+      console.log("Fetch already in progress or AI is typing.");
+      return;
+    }
+
+    this.isFetchingPageContent = true;
+    let originalBtnText = "";
+    if (this.getPageContentBtn) {
+      originalBtnText = this.getPageContentBtn.textContent;
+      this.getPageContentBtn.textContent = "🔄";
+      this.getPageContentBtn.classList.add('loading');
+      this.getPageContentBtn.disabled = true;
+    }
+
+    try {
+      console.log("Requesting page content from background...");
+      const response = await chrome.runtime.sendMessage({ action: "getPageContent" });
+
+      if (response.success) {
+        const pageData = response.data;
+        console.log("Received page content:", pageData);
+
+        const pageSummaryMessage = `[Current Web Page - Key Information]\nTitle: ${pageData.title}\nURL: ${pageData.url}\nContent:\n${pageData.content}`;
+
+        const currentInput = this.messageInput.value;
+        const separator = currentInput ? "\n\n" : "";
+        this.messageInput.value = currentInput + separator + pageSummaryMessage;
+        this.adjustInputHeight();
+
+        this.showNotification("Key page content added to message input.");
+      } else {
+        const errorMsg = response.error || "Unknown error occurred.";
+        console.error("Failed to get page content:", errorMsg);
+        this.showNotification(`Failed to get page content: ${errorMsg}`, 'error');
+      }
+    } catch (error) {
+      console.error("Error during fetchAndSendMessage:", error);
+      this.showNotification(`Error: ${error.message}`, 'error');
+    } finally {
+      this.isFetchingPageContent = false;
+      if (this.getPageContentBtn) {
+        this.getPageContentBtn.textContent = originalBtnText;
+        this.getPageContentBtn.classList.remove('loading');
+        this.getPageContentBtn.disabled = false;
+      }
+    }
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }
 

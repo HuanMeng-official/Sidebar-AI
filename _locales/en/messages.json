@@ -43,6 +43,10 @@
     "message": "Enter system prompt for the AI",
     "description": "Placeholder text for the system prompt textarea"
   },
+  "show_token_info": {
+    "message": "Show Token",
+    "description": "Show Token"
+  },
   "temperature": {
     "message": "Temperature (0-1)",
     "description": "Temperature setting label"

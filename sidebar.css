@@ -224,13 +224,13 @@ body {
 }
 
 @keyframes messageAppear {
-  from { 
-    opacity: 0; 
-    transform: translateY(8px) scale(0.95); 
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -289,7 +289,6 @@ body {
 
 .file-icon {
   font-size: 16px;
-  color: var(--ios-system-blue);
 }
 
 .file-info {
@@ -308,6 +307,16 @@ body {
 .file-size {
   font-size: 11px;
   color: var(--ios-secondary-label);
+}
+
+.token-info {
+  font-size: 12px;
+  color: var(--ios-secondary-label);
+  margin-top: 8px;
+  padding-top: 4px;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+  font-style: italic;
+  text-align: left;
 }
 
 /* Markdown 样式 */
@@ -494,12 +503,25 @@ body {
   animation: typing 1.4s infinite ease-in-out;
 }
 
-.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+.typing-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 @keyframes typing {
-  0%, 80%, 100% { transform: scale(0.8); opacity: 0.6; }
-  40% { transform: scale(1); opacity: 1; }
+  0%,
+  80%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* 输入区域 */
@@ -534,13 +556,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.7);
   z-index: 400;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -553,30 +575,9 @@ body {
   border-radius: 14px;
   padding: 32px;
   text-align: center;
-  box-shadow: 
-    0 10px 20px rgba(0, 0, 0, 0.15),
-    0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--ios-heavy-shadow);
   max-width: 300px;
   width: 90%;
-  transform: scale(1);
-  animation: dialogAppear 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  overflow: hidden;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes dialogAppear {
-  from { 
-    opacity: 0; 
-    transform: scale(0.8); 
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1); 
-  }
 }
 
 .file-upload-text {
@@ -677,6 +678,25 @@ body {
   transform: scale(0.95);
 }
 
+.page-content-btn:disabled {
+  color: var(--ios-system-gray3);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.page-content-btn.loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.05);
+  }
+}
+
 .message-input {
   flex: 1;
   height: 36px;
@@ -750,7 +770,6 @@ body {
   background-color: var(--ios-tertiary-background);
   border: 0.5px solid var(--ios-system-gray4);
   border-radius: var(--ios-small-border-radius);
-  margin-bottom: 10px;
   padding: 12px;
 }
 
@@ -988,12 +1007,6 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.setting-item textarea {
-  min-height: 60px;
-  resize: vertical;
-  line-height: 1.4;
-}
-
 #temperatureValue {
   font-size: 14px;
   color: var(--ios-secondary-label);
@@ -1026,6 +1039,79 @@ body {
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
 
+.ios-toggle-item {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ios-toggle-item label:first-child {
+  font-size: 17px;
+  font-weight: normal;
+  color: var(--ios-label);
+  flex: 1;
+  margin-right: 15px;
+  user-select: none;
+  text-align: left;
+}
+
+.ios-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.ios-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* 滑块轨道 (Track) */
+.ios-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ios-system-gray4);
+  transition: .3s;
+  border-radius: 30px;
+}
+
+/* 滑块 (Thumb/Knob) */
+.ios-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.ios-toggle-slider {
+  background-color: var(--ios-system-blue);
+}
+
+input:checked+.ios-toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.ios-toggle-switch input:focus+.ios-toggle-slider {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.5);
+}
+
+.ios-toggle-switch:hover input:not(:checked)+.ios-toggle-slider {
+  background-color: var(--ios-system-gray3);
+}
+
 .confirm-dialog {
   position: absolute;
   top: 0;
@@ -1037,8 +1123,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -1051,14 +1137,32 @@ body {
   border-radius: 14px;
   padding: 0;
   margin: 20px;
-  box-shadow: 
-    0 10px 20px rgba(0, 0, 0, 0.15),
-    0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--ios-heavy-shadow);
   max-width: 280px;
   width: 90%;
   transform: scale(1);
   animation: dialogAppear 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialogAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .confirm-content h3 {
@@ -1081,7 +1185,7 @@ body {
 
 .confirm-buttons {
   display: flex;
-  border-top: 0.5px solid var(--ios-system-gray5); 
+  border-top: 0.5px solid var(--ios-system-gray5);
 }
 
 .cancel-btn,
@@ -1096,7 +1200,7 @@ body {
   transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   text-align: center;
   color: var(--ios-label);
-  border-right: 0.5px solid var(--ios-system-gray5); 
+  border-right: 0.5px solid var(--ios-system-gray5);
 }
 
 .cancel-btn:last-child,
@@ -1291,49 +1395,60 @@ body {
   .message {
     max-width: 90%;
   }
-  
+
   .header h1 {
     font-size: 17px;
   }
-  
+
   .message-content {
     padding: 10px 14px;
     font-size: 14px;
   }
-  
-  .message-content h1 { font-size: 1.4em; }
-  .message-content h2 { font-size: 1.3em; }
-  .message-content h3 { font-size: 1.2em; }
-  .message-content h4 { font-size: 1.1em; }
-  
+
+  .message-content h1 {
+    font-size: 1.4em;
+  }
+
+  .message-content h2 {
+    font-size: 1.3em;
+  }
+
+  .message-content h3 {
+    font-size: 1.2em;
+  }
+
+  .message-content h4 {
+    font-size: 1.1em;
+  }
+
   .message-input,
   .send-btn {
     height: 32px;
     font-size: 14px;
   }
-  
+
   .message-input {
     padding: 0 12px;
     line-height: 32px;
   }
-  
+
   .send-btn {
     padding: 0 14px;
     min-width: 50px;
   }
-  
+
   .input-container {
     padding: 8px 10px;
     gap: 6px;
   }
-  
+
   .message-input.multiline {
     height: auto;
     min-height: 32px;
     padding: 6px 12px;
     line-height: 1.4;
   }
-  
+
   .history-btn,
   .new-chat-btn,
   .clear-btn,
@@ -1342,67 +1457,103 @@ body {
     height: 28px;
     font-size: 16px;
   }
-  
+
   .confirm-content {
     max-width: 260px;
   }
-  
+
   .confirm-content h3 {
     font-size: 16px;
     padding: 16px 14px 8px;
   }
-  
+
   .confirm-content p {
     font-size: 12px;
     padding: 0 14px 16px;
   }
-  
+
   .cancel-btn,
   .confirm-clear-btn {
     padding: 14px;
     font-size: 16px;
   }
-  
+
   .history-item {
     padding: 14px;
   }
-  
+
   .history-item-title {
     font-size: 15px;
   }
-  
+
   .history-item-preview {
     font-size: 13px;
   }
-  
+
   .attach-btn,
   .page-content-btn {
     width: 32px;
     height: 32px;
     font-size: 16px;
   }
-  
+
   .file-preview-name {
     font-size: 12px;
   }
-  
+
   .file-preview-size {
     font-size: 10px;
   }
-  
-  .setting-item input,
-  .setting-item select,
-  .setting-item textarea {
-    padding: 10px 12px;
+
+  .clear-files-btn {
+    width: 20px;
+    height: 20px;
     font-size: 14px;
   }
-  
-  .setting-item textarea {
-    min-height: 50px;
+
+  .file-preview-remove {
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+  }
+
+  .file-preview-icon {
+    font-size: 14px;
+  }
+
+  .file-preview-info {
+    min-width: 0;
+  }
+
+  .file-preview-name {
+    font-size: 12px;
+  }
+
+  .file-preview-size {
+    font-size: 10px;
+  }
+
+  .ios-toggle-item label:first-child {
+    font-size: 16px;
+  }
+
+  .ios-toggle-switch {
+    width: 46px;
+    height: 28px;
+  }
+
+  .ios-toggle-slider:before {
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+  }
+
+  input:checked+.ios-toggle-slider:before {
+    transform: translateX(18px);
   }
 }
 
-/* 暗黑模式支持 */
 @media (prefers-color-scheme: dark) {
   :root {
     --ios-background: #000000;
@@ -1418,7 +1569,7 @@ body {
     --ios-system-gray5: #2c2c2e;
     --ios-system-gray6: #1c1c1e;
   }
-  
+
   .header,
   .input-container,
   .settings-panel,
@@ -1430,7 +1581,7 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
-  
+
   .message-input,
   .setting-item input,
   .setting-item select,
@@ -1439,57 +1590,57 @@ body {
     background-color: var(--ios-tertiary-background);
     border-color: var(--ios-system-gray4);
   }
-  
+
   .ai-message .message-content,
   .typing-indicator .message-content {
     background-color: var(--ios-secondary-background);
     border-color: var(--ios-system-gray4);
     color: var(--ios-label);
   }
-  
+
   .confirm-dialog {
     background-color: rgba(0, 0, 0, 0.5);
   }
-  
+
   .cancel-btn:hover,
   .confirm-clear-btn:hover,
   .history-item:hover {
     background-color: var(--ios-system-gray5);
   }
-  
+
   .delete-history-btn:hover {
     background-color: var(--ios-system-gray5);
   }
-  
+
   .message-content code {
     background-color: var(--ios-system-gray5);
     border-color: var(--ios-system-gray4);
     color: #ff453a;
   }
-  
+
   .message-content pre {
     background-color: var(--ios-tertiary-background);
     border-color: var(--ios-system-gray4);
   }
-  
+
   .message-content a {
     color: #0a84ff;
     border-bottom-color: #0a84ff;
   }
-  
+
   .message-files {
     border-bottom-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   .message-file-preview {
     background-color: rgba(255, 255, 255, 0.05);
   }
-  
+
   .file-upload-content {
     background-color: var(--ios-secondary-background);
   }
-  
-  .setting-item textarea {
-    color: var(--ios-label);
+
+  .token-info {
+    border-top-color: rgba(255, 255, 255, 0.1);
   }
 }
