@@ -289,6 +289,7 @@ body {
 
 .file-icon {
   font-size: 16px;
+  color: var(--ios-system-blue);
 }
 
 .file-info {
@@ -533,13 +534,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 400;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -552,9 +553,30 @@ body {
   border-radius: 14px;
   padding: 32px;
   text-align: center;
-  box-shadow: var(--ios-heavy-shadow);
+  box-shadow: 
+    0 10px 20px rgba(0, 0, 0, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 300px;
   width: 90%;
+  transform: scale(1);
+  animation: dialogAppear 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialogAppear {
+  from { 
+    opacity: 0; 
+    transform: scale(0.8); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
 }
 
 .file-upload-text {
@@ -655,21 +677,6 @@ body {
   transform: scale(0.95);
 }
 
-.page-content-btn:disabled {
-  color: var(--ios-system-gray3);
-  cursor: not-allowed;
-  transform: none;
-}
-
-.page-content-btn.loading {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg) scale(1.05); }
-  100% { transform: rotate(360deg) scale(1.05); }
-}
-
 .message-input {
   flex: 1;
   height: 36px;
@@ -743,6 +750,7 @@ body {
   background-color: var(--ios-tertiary-background);
   border: 0.5px solid var(--ios-system-gray4);
   border-radius: var(--ios-small-border-radius);
+  margin-bottom: 10px;
   padding: 12px;
 }
 
@@ -1018,7 +1026,6 @@ body {
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
 
-/* 确认对话框 */
 .confirm-dialog {
   position: absolute;
   top: 0;
@@ -1030,8 +1037,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -1044,28 +1051,14 @@ body {
   border-radius: 14px;
   padding: 0;
   margin: 20px;
-  box-shadow: var(--ios-heavy-shadow);
+  box-shadow: 
+    0 10px 20px rgba(0, 0, 0, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 280px;
   width: 90%;
   transform: scale(1);
   animation: dialogAppear 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   overflow: hidden;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes dialogAppear {
-  from { 
-    opacity: 0; 
-    transform: scale(0.8); 
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1); 
-  }
 }
 
 .confirm-content h3 {
@@ -1088,7 +1081,7 @@ body {
 
 .confirm-buttons {
   display: flex;
-  border-top: 0.5px solid var(--ios-system-gray5);
+  border-top: 0.5px solid var(--ios-system-gray5); 
 }
 
 .cancel-btn,
@@ -1103,7 +1096,7 @@ body {
   transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   text-align: center;
   color: var(--ios-label);
-  border-right: 0.5px solid var(--ios-system-gray5);
+  border-right: 0.5px solid var(--ios-system-gray5); 
 }
 
 .cancel-btn:last-child,
@@ -1448,7 +1441,6 @@ body {
   }
   
   .ai-message .message-content,
-  .welcome-message .message-content,
   .typing-indicator .message-content {
     background-color: var(--ios-secondary-background);
     border-color: var(--ios-system-gray4);
