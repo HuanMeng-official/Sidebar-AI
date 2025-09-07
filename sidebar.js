@@ -615,31 +615,13 @@ class AIChatSidebar {
     const startTime = performance.now();
 
     try {
-      let response;
-      let tokens = { inputTokens: 0, outputTokens: 0, timeTakenMs: 0 };
-
       if (this.settings.apiType === 'gemini') {
-        const result = await this.callGeminiAPI(userMessage);
-        response = result.text;
-        tokens = { ...tokens, ...result.tokens };
+        // For Gemini, use streaming response
+        await this.callGeminiAPIStreaming(userMessage, startTime);
       } else {
-        const result = await this.callOpenAIAPI(userMessage);
-        response = result.text;
-        tokens = { ...tokens, ...result.tokens };
+        // For OpenAI, use streaming response
+        await this.callOpenAIAPIStreaming(userMessage, startTime);
       }
-
-      const endTime = performance.now();
-      tokens.timeTakenMs = endTime - startTime;
-
-      this.removeTypingIndicator();
-      if (this.currentConversation.length > 0) {
-        const lastMessage = this.currentConversation[this.currentConversation.length - 1];
-        if (lastMessage.sender === 'ai') {
-          lastMessage.tokens = tokens;
-        }
-      }
-      this.addMessageToUI(response, 'ai', [], true, tokens);
-      this.clearAttachedFiles();
     } catch (error) {
       this.removeTypingIndicator();
       this.addMessageToUI(`${chrome.i18n.getMessage('api_error')}${error.message}`, 'ai', [], true, null);
@@ -751,6 +733,326 @@ class AIChatSidebar {
       };
     } catch (error) {
       console.error('Gemini API call failed:', error);
+      throw error;
+    }
+  }
+
+  async callGeminiAPIStreaming(userMessage, startTime) {
+    if (!this.settings.apiKey) {
+      throw new Error(chrome.i18n.getMessage('api_key_required'));
+    }
+
+    try {
+      const contents = [];
+
+      const systemMessageContent = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
+      if (systemMessageContent) {
+        contents.push({
+          role: 'user',
+          parts: [{ text: systemMessageContent }]
+        });
+        contents.push({
+          role: 'model',
+          parts: [{ text: "Understood. I will follow these instructions." }]
+        });
+      }
+
+      for (const item of this.currentConversation) {
+        const contentParts = [];
+        if (item.content) {
+          contentParts.push({ text: item.content });
+        }
+
+        if (contentParts.length > 0) {
+          contents.push({
+            role: item.sender === 'user' ? 'user' : 'model',
+            parts: contentParts
+          });
+        }
+      }
+
+      if (this.attachedFiles.length > 0) {
+        const fileParts = await this.prepareFilesForGemini(this.attachedFiles);
+        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+          contents[contents.length - 1].parts.push(...fileParts);
+        } else {
+          contents.push({
+            role: 'user',
+            parts: fileParts
+          });
+        }
+      }
+
+      const requestBody = {
+        contents: contents,
+        generationConfig: {
+          temperature: this.settings.temperature,
+          maxOutputTokens: 8192
+        }
+      };
+
+      const model = this.settings.model || 'gemini-2.5-flash';
+      
+      // Use the correct streaming endpoint for Gemini
+      // For streaming, we use streamGenerateContent method with the correct model format
+      const modelName = model.includes('/') ? model : `models/${model}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:streamGenerateContent?key=${this.settings.apiKey}&alt=sse`;
+
+      console.log('Gemini Streaming API Request:', url, requestBody);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      console.log('Gemini API Response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Gemini API Error Response:', response.status, response.statusText, errorText);
+        
+        // Try fallback to non-streaming API if streaming fails
+        // Check if this might be a model that doesn't support streaming
+        const modelSupportsStreaming = this.settings.model && 
+          (this.settings.model.includes('gemini') || this.settings.model.includes('1.5') || this.settings.model.includes('2.0') || this.settings.model.includes('2.5'));
+        
+        if (response.status === 404 || response.status === 400 || response.status === 403 || !modelSupportsStreaming) {
+          console.log('Streaming not supported for this model, falling back to non-streaming Gemini API');
+          try {
+            const result = await this.callGeminiAPI(userMessage);
+            const endTime = performance.now();
+            const tokens = { 
+              ...result.tokens, 
+              timeTakenMs: endTime - startTime 
+            };
+            
+            this.removeTypingIndicator();
+            this.addMessageToUI(result.text, 'ai', [], true, tokens);
+            this.clearAttachedFiles();
+            return;
+          } catch (fallbackError) {
+            console.error('Fallback to non-streaming also failed:', fallbackError);
+            throw new Error(`Gemini API Error: ${response.status} ${response.statusText} - Fallback also failed`);
+          }
+        }
+        
+        throw new Error(`Gemini API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = '';
+      let aiMessageDiv = null;
+      let aiMessageContentDiv = null;
+      let outputTokens = 0;
+
+      // Create AI message container for streaming
+      this.removeTypingIndicator();
+      aiMessageDiv = document.createElement('div');
+      aiMessageDiv.className = 'message ai-message streaming-message';
+      aiMessageDiv.dataset.sender = 'ai';
+      
+      aiMessageContentDiv = document.createElement('div');
+      aiMessageContentDiv.className = 'message-content';
+      
+      const textDiv = document.createElement('div');
+      textDiv.className = 'message-text';
+      aiMessageContentDiv.appendChild(textDiv);
+      
+      aiMessageDiv.appendChild(aiMessageContentDiv);
+      this.chatContainer.appendChild(aiMessageDiv);
+      this.scrollToBottom();
+
+      let hasContent = false;
+      let streamTimeout = setTimeout(() => {
+        console.warn('Stream timeout - no data received for 30 seconds');
+        reader.cancel();
+      }, 30000);
+      
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          // Reset timeout on data reception
+          clearTimeout(streamTimeout);
+          streamTimeout = setTimeout(() => {
+            console.warn('Stream timeout - no data received for 30 seconds');
+            reader.cancel();
+          }, 30000);
+
+          // Handle empty chunks
+          if (!value) {
+            console.log('Received empty chunk, continuing...');
+            continue;
+          }
+
+          const chunk = decoder.decode(value, { stream: true });
+          console.log('Raw chunk received:', chunk);
+          
+          const lines = chunk.split('\n').filter(line => line.trim());
+
+          for (const line of lines) {
+            console.log('Processing line:', line);
+            
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') {
+                console.log('Stream completed with [DONE]');
+                break;
+              }
+
+            try {
+              const parsed = JSON.parse(data);
+              console.log('Gemini streaming chunk raw:', data);
+              console.log('Gemini streaming chunk parsed:', parsed);
+              
+              // Handle Gemini streaming response format - check multiple possible structures
+              let textChunk = '';
+              
+              // Structure 1: Standard candidate format (most common)
+              if (parsed.candidates && parsed.candidates[0]) {
+                const candidate = parsed.candidates[0];
+                
+                if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+                  const part = candidate.content.parts[0];
+                  if (part.text) {
+                    textChunk = part.text;
+                  }
+                }
+                
+                // Handle finish reason
+                if (candidate.finishReason && candidate.finishReason !== 'FINISH_REASON_UNSPECIFIED') {
+                  console.log('Stream finished with reason:', candidate.finishReason);
+                  break;
+                }
+              }
+              
+              // Structure 2: Direct text in response (some Gemini versions)
+              if (!textChunk && parsed.text) {
+                textChunk = parsed.text;
+              }
+              
+              // Structure 3: Error response
+              if (parsed.error) {
+                console.error('Gemini API error:', parsed.error);
+                break;
+              }
+              
+              // Structure 4: Usage metadata (contains token counts)
+              if (parsed.usageMetadata) {
+                console.log('Usage metadata:', parsed.usageMetadata);
+                // Can use this for token counting if needed
+              }
+              
+              if (textChunk) {
+                hasContent = true;
+                fullResponse += textChunk;
+                textDiv.innerHTML = this.renderMarkdown(fullResponse);
+                this.scrollToBottom();
+                
+                // Estimate tokens (roughly 4 characters per token)
+                outputTokens += Math.ceil(textChunk.length / 4);
+                
+                console.log('Received text chunk:', textChunk);
+              } else if (Object.keys(parsed).length > 0) {
+                console.log('Received non-text chunk:', parsed);
+              }
+            } catch (e) {
+              console.log('Error parsing Gemini streaming chunk:', e, data);
+              // Try to handle malformed JSON - sometimes Gemini sends incomplete chunks
+              if (data.includes('text') || data.includes('content')) {
+                console.log('Attempting to extract text from malformed JSON:', data);
+                // Simple text extraction from malformed JSON
+                const textMatch = data.match(/"text"\s*:\s*"([^"]*)"/);
+                if (textMatch && textMatch[1]) {
+                  const extractedText = textMatch[1];
+                  hasContent = true;
+                  fullResponse += extractedText;
+                  textDiv.innerHTML = this.renderMarkdown(fullResponse);
+                  this.scrollToBottom();
+                  outputTokens += Math.ceil(extractedText.length / 4);
+                  console.log('Extracted text from malformed JSON:', extractedText);
+                }
+              }
+            }
+          }
+        }
+      }
+      } catch (streamError) {
+        console.error('Stream reading error:', streamError);
+        if (streamError.name === 'AbortError') {
+          console.log('Stream was aborted due to timeout');
+        }
+      } finally {
+        clearTimeout(streamTimeout);
+      }
+
+      const endTime = performance.now();
+      const tokens = {
+        inputTokens: 0, // Gemini streaming doesn't provide input token count
+        outputTokens: outputTokens,
+        timeTakenMs: endTime - startTime
+      };
+
+      // Update the message with final content and tokens
+      aiMessageDiv.classList.remove('streaming-message');
+      
+      // If no content was received during streaming, fall back to non-streaming
+      if (!hasContent || fullResponse.trim() === '') {
+        console.log('No content received from streaming, falling back to non-streaming API');
+        aiMessageDiv.remove();
+        const result = await this.callGeminiAPI(userMessage);
+        tokens.inputTokens = result.tokens.inputTokens;
+        tokens.outputTokens = result.tokens.outputTokens;
+        
+        this.addMessageToUI(result.text, 'ai', [], true, tokens);
+        this.clearAttachedFiles();
+        return;
+      }
+      
+      // Add to conversation history
+      const messageItem = {
+        content: fullResponse.trim(),
+        sender: 'ai',
+        timestamp: Date.now(),
+        files: [],
+        tokens: tokens
+      };
+      this.currentConversation.push(messageItem);
+
+      // Add token info if enabled
+      if (this.settings.showTokenInfo) {
+        const tokenInfoDiv = document.createElement('div');
+        tokenInfoDiv.className = 'token-info';
+        
+        let tokenText = '';
+        if (tokens.outputTokens !== undefined) {
+          tokenText += `Out: ${tokens.outputTokens} tokens`;
+        }
+        if (tokens.timeTakenMs !== undefined && tokens.outputTokens !== undefined && tokens.outputTokens > 0) {
+          const timeInSeconds = tokens.timeTakenMs / 1000;
+          if (timeInSeconds > 0) {
+            const tokensPerSecond = (tokens.outputTokens / timeInSeconds).toFixed(2);
+            tokenText += tokenText ? ', ' : '';
+            tokenText += `Sed: ${tokensPerSecond} T/s`;
+          }
+        }
+
+        if (tokenText) {
+          tokenInfoDiv.textContent = tokenText;
+          aiMessageContentDiv.appendChild(tokenInfoDiv);
+        }
+      }
+
+      this.clearAttachedFiles();
+
+    } catch (error) {
+      this.removeTypingIndicator();
       throw error;
     }
   }
@@ -867,6 +1169,211 @@ class AIChatSidebar {
       text: data.choices[0].message.content.trim(),
       tokens: { inputTokens, outputTokens }
     };
+  }
+
+  async callOpenAIAPIStreaming(userMessage, startTime) {
+    if (!this.settings.apiKey) {
+      throw new Error(chrome.i18n.getMessage('api_key_required'));
+    }
+
+    const systemMessageContent = this.settings.systemPrompt || this.defaultSettings.systemPrompt;
+    const messages = [
+      { role: 'system', content: systemMessageContent }
+    ];
+
+    for (const item of this.currentConversation) {
+      let content = item.content || '';
+
+      if (item.files && item.files.length > 0) {
+        const fileInfos = item.files.map(file =>
+          `Attached file: ${file.name} (${this.formatFileSize(file.size)})`
+        ).join('\n');
+        if (fileInfos) {
+          content += (content ? '\n\n' : '') + fileInfos;
+        }
+      }
+
+      if (content) {
+        messages.push({
+          role: item.sender === 'user' ? 'user' : 'assistant',
+          content: content
+        });
+      }
+    }
+
+    let currentUserMessageContent = userMessage || '';
+
+    if (this.attachedFiles.length > 0) {
+      const contentParts = [];
+
+      if (currentUserMessageContent.trim()) {
+        contentParts.push({ type: 'text', text: currentUserMessageContent });
+      }
+
+      for (const file of this.attachedFiles) {
+        if (file.type.startsWith('image/')) {
+          try {
+            const base64DataUrl = await this.fileToBase64(file);
+            contentParts.push({
+              type: 'image_url',
+              image_url: {
+                url: base64DataUrl
+              }
+            });
+          } catch (error) {
+            console.error('Error processing image file for OpenAI:', file.name, error);
+            contentParts.push({ type: 'text', text: `[Error reading image: ${file.name}]` });
+          }
+        } else {
+          contentParts.push({
+            type: 'text',
+            text: `Attached file (not an image): ${file.name} (${this.formatFileSize(file.size)})`
+          });
+        }
+      }
+
+      messages.push({
+        role: 'user',
+        content: contentParts
+      });
+
+    } else {
+      if (currentUserMessageContent.trim()) {
+        messages.push({
+          role: 'user',
+          content: currentUserMessageContent
+        });
+      }
+    }
+
+    try {
+      const response = await fetch(this.settings.apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.settings.apiKey}`
+        },
+        body: JSON.stringify({
+          model: this.settings.model,
+          messages: messages,
+          temperature: this.settings.temperature,
+          stream: true
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || `OpenAI API request failed: ${response.status} ${response.statusText}`;
+        console.error('OpenAI API Error Response:', errorData);
+        throw new Error(errorMessage);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = '';
+      let aiMessageDiv = null;
+      let aiMessageContentDiv = null;
+      let outputTokens = 0;
+
+      // Create AI message container for streaming
+      this.removeTypingIndicator();
+      aiMessageDiv = document.createElement('div');
+      aiMessageDiv.className = 'message ai-message streaming-message';
+      aiMessageDiv.dataset.sender = 'ai';
+      
+      aiMessageContentDiv = document.createElement('div');
+      aiMessageContentDiv.className = 'message-content';
+      
+      const textDiv = document.createElement('div');
+      textDiv.className = 'message-text';
+      aiMessageContentDiv.appendChild(textDiv);
+      
+      aiMessageDiv.appendChild(aiMessageContentDiv);
+      this.chatContainer.appendChild(aiMessageDiv);
+      this.scrollToBottom();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim());
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') {
+              break;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta) {
+                const delta = parsed.choices[0].delta;
+                if (delta.content) {
+                  fullResponse += delta.content;
+                  textDiv.innerHTML = this.renderMarkdown(fullResponse);
+                  this.scrollToBottom();
+                  outputTokens++;
+                }
+              }
+            } catch (e) {
+              console.log('Error parsing streaming chunk:', e, data);
+            }
+          }
+        }
+      }
+
+      const endTime = performance.now();
+      const tokens = {
+        inputTokens: 0, // Will be updated from usage data if available
+        outputTokens: outputTokens,
+        timeTakenMs: endTime - startTime
+      };
+
+      // Update the message with final content and tokens
+      aiMessageDiv.classList.remove('streaming-message');
+      
+      // Add to conversation history
+      const messageItem = {
+        content: fullResponse,
+        sender: 'ai',
+        timestamp: Date.now(),
+        files: [],
+        tokens: tokens
+      };
+      this.currentConversation.push(messageItem);
+
+      // Add token info if enabled
+      if (this.settings.showTokenInfo) {
+        const tokenInfoDiv = document.createElement('div');
+        tokenInfoDiv.className = 'token-info';
+        
+        let tokenText = '';
+        if (tokens.outputTokens !== undefined) {
+          tokenText += `Out: ${tokens.outputTokens} tokens`;
+        }
+        if (tokens.timeTakenMs !== undefined && tokens.outputTokens !== undefined && tokens.outputTokens > 0) {
+          const timeInSeconds = tokens.timeTakenMs / 1000;
+          if (timeInSeconds > 0) {
+            const tokensPerSecond = (tokens.outputTokens / timeInSeconds).toFixed(2);
+            tokenText += tokenText ? ', ' : '';
+            tokenText += `Sed: ${tokensPerSecond} T/s`;
+          }
+        }
+
+        if (tokenText) {
+          tokenInfoDiv.textContent = tokenText;
+          aiMessageContentDiv.appendChild(tokenInfoDiv);
+        }
+      }
+
+      this.clearAttachedFiles();
+
+    } catch (error) {
+      this.removeTypingIndicator();
+      throw error;
+    }
   }
 
 
