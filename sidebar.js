@@ -1752,11 +1752,11 @@ class AIChatSidebar {
       } else {
         const errorMsg = response.error || "Unknown error occurred.";
         console.error("Failed to get page content:", errorMsg);
-        this.showNotification(`获取网页内容失败: ${errorMsg}`, 'error');
+        this.showNotification(`Failed to get page content: ${errorMsg}`, 'error');
       }
     } catch (error) {
       console.error("Error during fetchAndSendMessage:", error);
-      this.showNotification(`错误: ${error.message}`, 'error');
+      this.showNotification(`Error: ${error.message}`, 'error');
     } finally {
       this.isFetchingPageContent = false;
       if (this.getPageContentBtn) {
