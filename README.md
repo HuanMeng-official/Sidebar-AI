@@ -2,6 +2,8 @@
 
 > A Chrome Manifest V3 extension that provides an AI chat interface in the browser sidebar with customizable API endpoints, models, and APPLE UI design.
 
+[English Version](README.md) | [中文版本](README.zh-CN.md)
+
 ## Features
 
 ```
@@ -99,9 +101,6 @@ project/
 ### Supported Languages
 - **English (en)**: Primary language with full feature coverage
 - **Simplified Chinese (zh_CN)**: Complete Mandarin localization
-- **Japanese (ja)**: Native Japanese interface translation
-- **Korean (ko)**: Full Korean language support
-- **French (fr)**: European French localization
 
 ### Translation Framework
 - **Message Bundles**: JSON-based i18n message catalogs
