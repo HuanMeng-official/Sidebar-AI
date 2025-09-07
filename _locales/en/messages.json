@@ -146,5 +146,21 @@
   "get_page_content": {
     "message": "Get Current Page Content",
     "description": "Get page content button title"
+  },
+  "web_ref_notification": {
+    "message": "Web content referenced, use @pagetitle to reference content",
+    "description": "Notification when web content is referenced"
+  },
+  "web_ref_label": {
+    "message": "Web Reference",
+    "description": "Label for web reference section"
+  },
+  "web_ref_url": {
+    "message": "URL",
+    "description": "Label for URL in web reference"
+  },
+  "web_ref_summary": {
+    "message": "Content Summary",
+    "description": "Label for content summary in web reference"
   }
 }

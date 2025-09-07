@@ -1660,3 +1660,59 @@ input:checked+.ios-toggle-slider:before {
     border-top-color: rgba(255, 255, 255, 0.1);
   }
 }
+
+/* 网页引用样式 */
+.web-references {
+  margin-top: 8px;
+  border-left: 3px solid var(--ios-system-blue);
+  padding-left: 12px;
+  background-color: rgba(0, 122, 255, 0.05);
+  border-radius: var(--ios-small-border-radius);
+  padding: 12px;
+}
+
+.web-reference {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: var(--ios-secondary-background);
+  border-radius: var(--ios-small-border-radius);
+  border: 1px solid var(--ios-system-gray5);
+  box-shadow: var(--ios-shadow);
+}
+
+.web-reference:last-child {
+  margin-bottom: 0;
+}
+
+.web-ref-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--ios-system-blue);
+}
+
+.web-ref-icon {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.web-ref-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ios-system-blue);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.web-ref-preview {
+  font-size: 13px;
+  color: var(--ios-secondary-label);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

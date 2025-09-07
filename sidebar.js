@@ -374,6 +374,31 @@ class AIChatSidebar {
     });
   }
 
+  processWebReferences(message) {
+    const webRefs = [];
+    
+    // 检查消息中是否包含 @标题 引用
+    const webRefRegex = /@([^\s@]+)/g;
+    let match;
+    
+    while ((match = webRefRegex.exec(message)) !== null) {
+      const refTitle = match[1];
+      
+      // 在存储的网页引用中查找匹配的标题
+      if (this.webReferences) {
+        const matchedRef = this.webReferences.find(ref => 
+          ref.title.includes(refTitle) || refTitle.includes(ref.title)
+        );
+        
+        if (matchedRef) {
+          webRefs.push(matchedRef);
+        }
+      }
+    }
+    
+    return webRefs;
+  }
+
   escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -441,21 +466,24 @@ class AIChatSidebar {
   }
 
   sendMessage() {
-    const message = this.messageInput.value.trim();
+    let message = this.messageInput.value.trim();
 
     if ((!message && this.attachedFiles.length === 0) || this.isTyping) return;
 
-    this.addMessage(message, 'user', this.attachedFiles);
+    // 处理 @网页 引用
+    const webReferences = this.processWebReferences(message);
+    
+    this.addMessage(message, 'user', this.attachedFiles, webReferences);
 
     this.messageInput.value = '';
     this.messageInput.style.height = '36px';
     this.messageInput.classList.remove('multiline');
     this.sendBtn.disabled = true;
 
-    this.getAIResponse(message);
+    this.getAIResponse(message, webReferences);
   }
 
-  addMessage(content, sender, files = []) {
+  addMessage(content, sender, files = [], webReferences = []) {
     const messageItem = {
       content: content,
       sender: sender,
@@ -464,14 +492,15 @@ class AIChatSidebar {
         name: file.name,
         size: file.size,
         type: file.type
-      }))
+      })),
+      webReferences: webReferences
     };
 
     this.currentConversation.push(messageItem);
-    this.addMessageToUI(content, sender, files, true);
+    this.addMessageToUI(content, sender, files, true, null, webReferences);
   }
 
-  addMessageToUI(content, sender, files = [], isNewMessage = true, tokens = null) {
+  addMessageToUI(content, sender, files = [], isNewMessage = true, tokens = null, webReferences = []) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
     messageDiv.dataset.sender = sender;
@@ -512,6 +541,27 @@ class AIChatSidebar {
       textDiv.className = 'message-text';
       textDiv.innerHTML = this.renderMarkdown(content);
       contentDiv.appendChild(textDiv);
+    }
+
+    // 显示网页引用
+    if (webReferences && webReferences.length > 0) {
+      const webRefsDiv = document.createElement('div');
+      webRefsDiv.className = 'web-references';
+      
+      webReferences.forEach(ref => {
+        const refDiv = document.createElement('div');
+        refDiv.className = 'web-reference';
+        refDiv.innerHTML = `
+          <div class="web-ref-header">
+            <span class="web-ref-icon">🌐</span>
+            <span class="web-ref-title" title="${this.escapeHtml(ref.url)}">${this.escapeHtml(ref.title)}</span>
+          </div>
+          <div class="web-ref-preview">${this.escapeHtml(ref.content.substring(0, 150))}...</div>
+        `;
+        webRefsDiv.appendChild(refDiv);
+      });
+      
+      contentDiv.appendChild(webRefsDiv);
     }
 
     messageDiv.appendChild(contentDiv);
@@ -609,7 +659,7 @@ class AIChatSidebar {
     });
   }
 
-  async getAIResponse(userMessage) {
+  async getAIResponse(userMessage, webReferences = []) {
     this.addTypingIndicator();
 
     const startTime = performance.now();
@@ -617,10 +667,10 @@ class AIChatSidebar {
     try {
       if (this.settings.apiType === 'gemini') {
         // For Gemini, use streaming response
-        await this.callGeminiAPIStreaming(userMessage, startTime);
+        await this.callGeminiAPIStreaming(userMessage, startTime, webReferences);
       } else {
         // For OpenAI, use streaming response
-        await this.callOpenAIAPIStreaming(userMessage, startTime);
+        await this.callOpenAIAPIStreaming(userMessage, startTime, webReferences);
       }
     } catch (error) {
       this.removeTypingIndicator();
@@ -673,6 +723,25 @@ class AIChatSidebar {
           contents.push({
             role: 'user',
             parts: fileParts
+          });
+        }
+      }
+
+      // 添加网页引用内容
+      if (webReferences.length > 0) {
+        const webRefParts = [];
+        webReferences.forEach(ref => {
+          webRefParts.push({ 
+            text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 500)}...`
+          });
+        });
+        
+        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+          contents[contents.length - 1].parts.push(...webRefParts);
+        } else {
+          contents.push({
+            role: 'user',
+            parts: webRefParts
           });
         }
       }
@@ -737,7 +806,7 @@ class AIChatSidebar {
     }
   }
 
-  async callGeminiAPIStreaming(userMessage, startTime) {
+  async callGeminiAPIStreaming(userMessage, startTime, webReferences = []) {
     if (!this.settings.apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
@@ -779,6 +848,25 @@ class AIChatSidebar {
           contents.push({
             role: 'user',
             parts: fileParts
+          });
+        }
+      }
+
+      // 添加网页引用内容
+      if (webReferences.length > 0) {
+        const webRefParts = [];
+        webReferences.forEach(ref => {
+          webRefParts.push({ 
+            text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 500)}...`
+          });
+        });
+        
+        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+          contents[contents.length - 1].parts.push(...webRefParts);
+        } else {
+          contents.push({
+            role: 'user',
+            parts: webRefParts
           });
         }
       }
@@ -1171,7 +1259,7 @@ class AIChatSidebar {
     };
   }
 
-  async callOpenAIAPIStreaming(userMessage, startTime) {
+  async callOpenAIAPIStreaming(userMessage, startTime, webReferences = []) {
     if (!this.settings.apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
@@ -1242,6 +1330,23 @@ class AIChatSidebar {
         messages.push({
           role: 'user',
           content: currentUserMessageContent
+        });
+      }
+    }
+
+    // 添加网页引用内容
+    if (webReferences.length > 0) {
+      let webRefContent = `\n\n[${chrome.i18n.getMessage('web_ref_label')}]\n`;
+      webReferences.forEach(ref => {
+        webRefContent += `\n---\n${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 300)}...\n---\n`;
+      });
+      
+      if (messages.length > 0 && messages[messages.length - 1].role === 'user') {
+        messages[messages.length - 1].content += webRefContent;
+      } else {
+        messages.push({
+          role: 'user',
+          content: webRefContent
         });
       }
     }
@@ -1621,22 +1726,37 @@ class AIChatSidebar {
         const pageData = response.data;
         console.log("Received page content:", pageData);
 
-        const pageSummaryMessage = `[Current Web Page - Key Information]\nTitle: ${pageData.title}\nURL: ${pageData.url}\nContent:\n${pageData.content}`;
+        // 创建网页引用对象
+        const webReference = {
+          type: 'web_page',
+          url: pageData.url,
+          title: pageData.title,
+          content: pageData.content,
+          timestamp: Date.now(),
+          id: 'web_' + Date.now()
+        };
 
+        // 存储网页引用
+        if (!this.webReferences) {
+          this.webReferences = [];
+        }
+        this.webReferences.push(webReference);
+
+        // 在消息输入框中添加 @网页标题 引用
         const currentInput = this.messageInput.value;
-        const separator = currentInput ? "\n\n" : "";
-        this.messageInput.value = currentInput + separator + pageSummaryMessage;
+        const separator = currentInput ? " " : "";
+        this.messageInput.value = currentInput + separator + `@${pageData.title}`;
         this.adjustInputHeight();
 
-        this.showNotification("Key page content added to message input.");
+        this.showNotification(chrome.i18n.getMessage('web_ref_notification'));
       } else {
         const errorMsg = response.error || "Unknown error occurred.";
         console.error("Failed to get page content:", errorMsg);
-        this.showNotification(`Failed to get page content: ${errorMsg}`, 'error');
+        this.showNotification(`获取网页内容失败: ${errorMsg}`, 'error');
       }
     } catch (error) {
       console.error("Error during fetchAndSendMessage:", error);
-      this.showNotification(`Error: ${error.message}`, 'error');
+      this.showNotification(`错误: ${error.message}`, 'error');
     } finally {
       this.isFetchingPageContent = false;
       if (this.getPageContentBtn) {

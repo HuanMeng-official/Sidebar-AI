@@ -146,5 +146,21 @@
   "get_page_content": {
     "message": "获取当前页面内容",
     "description": "获取页面内容按钮标题"
+  },
+  "web_ref_notification": {
+    "message": "网页内容已引用，使用 @页面标题 引用内容",
+    "description": "网页内容引用时的通知"
+  },
+  "web_ref_label": {
+    "message": "网页引用",
+    "description": "网页引用部分的标签"
+  },
+  "web_ref_url": {
+    "message": "网址",
+    "description": "网页引用中的网址标签"
+  },
+  "web_ref_summary": {
+    "message": "内容摘要",
+    "description": "网页引用中的内容摘要标签"
   }
 }
