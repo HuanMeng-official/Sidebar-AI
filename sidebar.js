@@ -681,7 +681,7 @@ class AIChatSidebar {
     this.sendBtn.disabled = false;
   }
 
-  async callGeminiAPI(message) {
+  async callGeminiAPI(message, webReferences = []) {
     if (!this.settings.apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
@@ -911,7 +911,7 @@ class AIChatSidebar {
         if (response.status === 404 || response.status === 400 || response.status === 403 || !modelSupportsStreaming) {
           console.log('Streaming not supported for this model, falling back to non-streaming Gemini API');
           try {
-            const result = await this.callGeminiAPI(userMessage);
+            const result = await this.callGeminiAPI(userMessage, webReferences);
             const endTime = performance.now();
             const tokens = { 
               ...result.tokens, 
@@ -1094,7 +1094,7 @@ class AIChatSidebar {
       if (!hasContent || fullResponse.trim() === '') {
         console.log('No content received from streaming, falling back to non-streaming API');
         aiMessageDiv.remove();
-        const result = await this.callGeminiAPI(userMessage);
+        const result = await this.callGeminiAPI(userMessage, webReferences);
         tokens.inputTokens = result.tokens.inputTokens;
         tokens.outputTokens = result.tokens.outputTokens;
         
