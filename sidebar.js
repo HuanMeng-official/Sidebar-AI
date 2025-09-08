@@ -238,7 +238,7 @@ class AIChatSidebar {
       }
       this.populateSettingsForm();
     } catch (error) {
-      console.error('加载设置失败:', error);
+      console.error('Failed to load settings:', error);
     }
   }
 
@@ -249,7 +249,7 @@ class AIChatSidebar {
         this.conversationHistory = result.conversationHistory;
       }
     } catch (error) {
-      console.error('加载对话历史失败:', error);
+      console.error('Failed to load conversation history:', error);
     }
   }
 
@@ -260,7 +260,7 @@ class AIChatSidebar {
       }
       await chrome.storage.local.set({ conversationHistory: this.conversationHistory });
     } catch (error) {
-      console.error('保存对话历史失败:', error);
+      console.error('Failed to save conversation history:', error);
     }
   }
 
@@ -297,7 +297,7 @@ class AIChatSidebar {
       this.closeSettings();
       this.showNotification(chrome.i18n.getMessage('settings_saved'));
     } catch (error) {
-      console.error('保存设置失败:', error);
+      console.error('Failed to save settings:', error);
       this.showNotification(chrome.i18n.getMessage('settings_save_failed'), 'error');
     }
   }
@@ -666,10 +666,10 @@ class AIChatSidebar {
 
     try {
       if (this.settings.apiType === 'gemini') {
-        // For Gemini, use streaming response
+        // 流式响应（Gemini）
         await this.callGeminiAPIStreaming(userMessage, startTime, webReferences);
       } else {
-        // For OpenAI, use streaming response
+        // OpenAI 同上
         await this.callOpenAIAPIStreaming(userMessage, startTime, webReferences);
       }
     } catch (error) {
@@ -881,8 +881,7 @@ class AIChatSidebar {
 
       const model = this.settings.model || 'gemini-2.5-flash';
       
-      // Use the correct streaming endpoint for Gemini
-      // For streaming, we use streamGenerateContent method with the correct model format
+      // 为 Gemini 使用 streamGenerateContent 方法
       const modelName = model.includes('/') ? model : `models/${model}`;
       const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:streamGenerateContent?key=${this.settings.apiKey}&alt=sse`;
 
@@ -903,8 +902,7 @@ class AIChatSidebar {
         const errorText = await response.text();
         console.error('Gemini API Error Response:', response.status, response.statusText, errorText);
         
-        // Try fallback to non-streaming API if streaming fails
-        // Check if this might be a model that doesn't support streaming
+        // 退回非流式传输
         const modelSupportsStreaming = this.settings.model && 
           (this.settings.model.includes('gemini') || this.settings.model.includes('1.5') || this.settings.model.includes('2.0') || this.settings.model.includes('2.5'));
         
@@ -938,7 +936,7 @@ class AIChatSidebar {
       let aiMessageContentDiv = null;
       let outputTokens = 0;
 
-      // Create AI message container for streaming
+      // 为流式传输创建 AI 消息容器
       this.removeTypingIndicator();
       aiMessageDiv = document.createElement('div');
       aiMessageDiv.className = 'message ai-message streaming-message';
@@ -966,14 +964,14 @@ class AIChatSidebar {
           const { done, value } = await reader.read();
           if (done) break;
 
-          // Reset timeout on data reception
+          // 在接收到数据时重置超时
           clearTimeout(streamTimeout);
           streamTimeout = setTimeout(() => {
             console.warn('Stream timeout - no data received for 30 seconds');
             reader.cancel();
           }, 30000);
 
-          // Handle empty chunks
+          // 处理空数据块
           if (!value) {
             console.log('Received empty chunk, continuing...');
             continue;
@@ -999,10 +997,10 @@ class AIChatSidebar {
               console.log('Gemini streaming chunk raw:', data);
               console.log('Gemini streaming chunk parsed:', parsed);
               
-              // Handle Gemini streaming response format - check multiple possible structures
+              // 处理 Gemini 流式响应格式，检查多种可能的结构
               let textChunk = '';
               
-              // Structure 1: Standard candidate format (most common)
+              // 标准候选格式
               if (parsed.candidates && parsed.candidates[0]) {
                 const candidate = parsed.candidates[0];
                 
@@ -1013,28 +1011,28 @@ class AIChatSidebar {
                   }
                 }
                 
-                // Handle finish reason
+                // 处理结束原因
                 if (candidate.finishReason && candidate.finishReason !== 'FINISH_REASON_UNSPECIFIED') {
                   console.log('Stream finished with reason:', candidate.finishReason);
                   break;
                 }
               }
               
-              // Structure 2: Direct text in response (some Gemini versions)
+              // 响应中直接包含文本
               if (!textChunk && parsed.text) {
                 textChunk = parsed.text;
               }
               
-              // Structure 3: Error response
+              // 错误响应
               if (parsed.error) {
                 console.error('Gemini API error:', parsed.error);
                 break;
               }
               
-              // Structure 4: Usage metadata (contains token counts)
+              // 元数据使用量
               if (parsed.usageMetadata) {
                 console.log('Usage metadata:', parsed.usageMetadata);
-                // Can use this for token counting if needed
+                // TODO: 令牌计数
               }
               
               if (textChunk) {
@@ -1043,7 +1041,7 @@ class AIChatSidebar {
                 textDiv.innerHTML = this.renderMarkdown(fullResponse);
                 this.scrollToBottom();
                 
-                // Estimate tokens (roughly 4 characters per token)
+                // 估算令牌数（4个字符为1个 Token）
                 outputTokens += Math.ceil(textChunk.length / 4);
                 
                 console.log('Received text chunk:', textChunk);
@@ -1052,10 +1050,10 @@ class AIChatSidebar {
               }
             } catch (e) {
               console.log('Error parsing Gemini streaming chunk:', e, data);
-              // Try to handle malformed JSON - sometimes Gemini sends incomplete chunks
+              // 尝试处理格式错误的 JSON
               if (data.includes('text') || data.includes('content')) {
                 console.log('Attempting to extract text from malformed JSON:', data);
-                // Simple text extraction from malformed JSON
+                // 从格式错误的 JSON 中提取简单文本
                 const textMatch = data.match(/"text"\s*:\s*"([^"]*)"/);
                 if (textMatch && textMatch[1]) {
                   const extractedText = textMatch[1];
@@ -1082,15 +1080,15 @@ class AIChatSidebar {
 
       const endTime = performance.now();
       const tokens = {
-        inputTokens: 0, // Gemini streaming doesn't provide input token count
+        inputTokens: 0, // Gemini 流式传输不提供输入令牌计数
         outputTokens: outputTokens,
         timeTakenMs: endTime - startTime
       };
 
-      // Update the message with final content and tokens
+      // 使用最终内容和令牌数更新消息
       aiMessageDiv.classList.remove('streaming-message');
       
-      // If no content was received during streaming, fall back to non-streaming
+      // 如果在流式传输过程中未接收到任何内容，则回退到非流式传输
       if (!hasContent || fullResponse.trim() === '') {
         console.log('No content received from streaming, falling back to non-streaming API');
         aiMessageDiv.remove();
@@ -1103,7 +1101,7 @@ class AIChatSidebar {
         return;
       }
       
-      // Add to conversation history
+      // 添加到对话历史
       const messageItem = {
         content: fullResponse.trim(),
         sender: 'ai',
@@ -1113,7 +1111,7 @@ class AIChatSidebar {
       };
       this.currentConversation.push(messageItem);
 
-      // Add token info if enabled
+      // 添加到 Tokens 统计
       if (this.settings.showTokenInfo) {
         const tokenInfoDiv = document.createElement('div');
         tokenInfoDiv.className = 'token-info';
@@ -1380,7 +1378,7 @@ class AIChatSidebar {
       let aiMessageContentDiv = null;
       let outputTokens = 0;
 
-      // Create AI message container for streaming
+      // 为流式传输创建 AI 消息容器
       this.removeTypingIndicator();
       aiMessageDiv = document.createElement('div');
       aiMessageDiv.className = 'message ai-message streaming-message';
@@ -1431,15 +1429,15 @@ class AIChatSidebar {
 
       const endTime = performance.now();
       const tokens = {
-        inputTokens: 0, // Will be updated from usage data if available
+        inputTokens: 0, // 如有可用的使用量数据，将据此更新
         outputTokens: outputTokens,
         timeTakenMs: endTime - startTime
       };
 
-      // Update the message with final content and tokens
+      // 使用最终内容和令牌数更新消息
       aiMessageDiv.classList.remove('streaming-message');
       
-      // Add to conversation history
+      // 添加到对话历史
       const messageItem = {
         content: fullResponse,
         sender: 'ai',
@@ -1449,7 +1447,7 @@ class AIChatSidebar {
       };
       this.currentConversation.push(messageItem);
 
-      // Add token info if enabled
+      // 添加到 Tokens 统计
       if (this.settings.showTokenInfo) {
         const tokenInfoDiv = document.createElement('div');
         tokenInfoDiv.className = 'token-info';
