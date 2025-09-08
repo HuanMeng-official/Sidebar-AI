@@ -1,0 +1,166 @@
+{
+    "extension_name": {
+      "message": "サイドバーAI",
+      "description": "拡張機能の名前"
+    },
+    "extension_description": {
+      "message": "サイドバーでAIとチャット",
+      "description": "拡張機能の説明"
+    },
+    "open_ai_chat": {
+      "message": "AIチャットを開く",
+      "description": "アクションボタンのタイトル"
+    },
+    "ai_chat": {
+      "message": "サイドバーAI",
+      "description": "ヘッダーのタイトル"
+    },
+    "settings": {
+      "message": "設定",
+      "description": "設定パネルのタイトル"
+    },
+    "api_endpoint": {
+      "message": "APIエンドポイント",
+      "description": "APIエンドポイントのラベル"
+    },
+    "api_key": {
+      "message": "APIキー",
+      "description": "APIキーのラベル"
+    },
+    "api_type": {
+      "message": "APIタイプ",
+      "description": "APIタイプ選択ラベル"
+    },
+    "model": {
+      "message": "モデル",
+      "description": "モデル選択ラベル"
+    },
+    "system_prompt": {
+      "message": "システムプロンプト",
+      "description": "設定内のシステムプロンプト入力欄のラベル"
+    },
+    "system_prompt_placeholder": {
+      "message": "AI用のシステムプロンプトを入力してください",
+      "description": "システムプロンプト入力欄のプレースホルダーテキスト"
+    },
+    "show_token_info": {
+      "message": "トークンを表示",
+      "description": "トークン情報を表示するオプション"
+    },
+    "temperature": {
+      "message": "温度（0～1）",
+      "description": "温度設定のラベル"
+    },
+    "save_settings": {
+      "message": "設定を保存",
+      "description": "設定保存ボタンのテキスト"
+    },
+    "enter_message": {
+      "message": "メッセージを入力...",
+      "description": "メッセージ入力欄のプレースホルダー"
+    },
+    "send": {
+      "message": "送信",
+      "description": "送信ボタンのテキスト"
+    },
+    "settings_saved": {
+      "message": "設定を正常に保存しました",
+      "description": "設定保存完了通知"
+    },
+    "settings_save_failed": {
+      "message": "設定の保存に失敗しました",
+      "description": "設定保存失敗通知"
+    },
+    "api_key_required": {
+      "message": "最初に設定でAPIキーを設定してください",
+      "description": "APIキー未設定時のエラーメッセージ"
+    },
+    "api_error": {
+      "message": "申し訳ありません、エラーが発生しました：",
+      "description": "APIエラーメッセージの接頭辞"
+    },
+    "new_chat": {
+      "message": "新規チャット",
+      "description": "新規チャットボタンのタイトル"
+    },
+    "clear_conversation": {
+      "message": "会話をクリア",
+      "description": "会話クリアボタンのタイトル"
+    },
+    "clear_confirm_message": {
+      "message": "本当にすべてのメッセージをクリアしますか？",
+      "description": "クリア確認メッセージ"
+    },
+    "new_chat_confirm_message": {
+      "message": "新しい会話を開始しますか？現在の会話は保存されます。",
+      "description": "新規チャット確認メッセージ"
+    },
+    "cancel": {
+      "message": "キャンセル",
+      "description": "キャンセルボタンのテキスト"
+    },
+    "clear": {
+      "message": "クリア",
+      "description": "クリアボタンのテキスト"
+    },
+    "delete": {
+      "message": "削除",
+      "description": "削除ボタンのテキスト"
+    },
+    "conversation_cleared": {
+      "message": "会話をクリアしました",
+      "description": "会話クリア完了通知"
+    },
+    "new_chat_created": {
+      "message": "新しいチャットを作成しました",
+      "description": "新規チャット作成通知"
+    },
+    "conversation_deleted": {
+      "message": "会話を削除しました",
+      "description": "会話削除完了通知"
+    },
+    "chat_history": {
+      "message": "チャット履歴",
+      "description": "チャット履歴パネルのタイトル"
+    },
+    "no_history": {
+      "message": "チャット履歴がありません",
+      "description": "履歴なしメッセージ"
+    },
+    "drop_files_here": {
+      "message": "ここにファイルをドロップ、またはクリックしてアップロード",
+      "description": "ファイルドロップエリアのテキスト"
+    },
+    "attached_files": {
+      "message": "添付ファイル",
+      "description": "添付ファイルセクションのタイトル"
+    },
+    "file_too_large": {
+      "message": "ファイルが大きすぎます（最大10MB）",
+      "description": "ファイルサイズ超過エラーメッセージ"
+    },
+    "attach_file": {
+      "message": "ファイルを添付",
+      "description": "ファイル添付ボタンのタイトル"
+    },
+    "get_page_content": {
+      "message": "現在のページの内容を取得",
+      "description": "ページ内容取得ボタンのタイトル"
+    },
+    "web_ref_notification": {
+      "message": "ウェブコンテンツを参照しました。@ページタイトル で内容を参照できます",
+      "description": "ウェブコンテンツ参照時の通知"
+    },
+    "web_ref_label": {
+      "message": "ウェブ参照",
+      "description": "ウェブ参照セクションのラベル"
+    },
+    "web_ref_url": {
+      "message": "URL",
+      "description": "ウェブ参照内のURLラベル"
+    },
+    "web_ref_summary": {
+      "message": "内容の要約",
+      "description": "ウェブ参照内の内容要約ラベル"
+    }
+  }
