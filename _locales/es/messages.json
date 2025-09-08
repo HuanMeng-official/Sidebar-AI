@@ -1,0 +1,166 @@
+{
+    "extension_name": {
+      "message": "IA en la barra lateral",
+      "description": "Nombre de la extensión"
+    },
+    "extension_description": {
+      "message": "Chatea con IA en la barra lateral",
+      "description": "Descripción de la extensión"
+    },
+    "open_ai_chat": {
+      "message": "Abrir chat con IA",
+      "description": "Título del botón de acción"
+    },
+    "ai_chat": {
+      "message": "Sidebar AI",
+      "description": "Título del encabezado"
+    },
+    "settings": {
+      "message": "Configuración",
+      "description": "Título del panel de configuración"
+    },
+    "api_endpoint": {
+      "message": "Punto final de la API",
+      "description": "Etiqueta del punto final de la API"
+    },
+    "api_key": {
+      "message": "Clave de API",
+      "description": "Etiqueta de la clave de API"
+    },
+    "api_type": {
+      "message": "Tipo de API",
+      "description": "Etiqueta de selección del tipo de API"
+    },
+    "model": {
+      "message": "Modelo",
+      "description": "Etiqueta de selección del modelo"
+    },
+    "system_prompt": {
+      "message": "Indicación del sistema",
+      "description": "Etiqueta del área de texto para la indicación del sistema en configuración"
+    },
+    "system_prompt_placeholder": {
+      "message": "Ingresa la indicación del sistema para la IA",
+      "description": "Texto de marcador de posición para el área de texto de la indicación del sistema"
+    },
+    "show_token_info": {
+      "message": "Mostrar tokens",
+      "description": "Mostrar información de tokens"
+    },
+    "temperature": {
+      "message": "Temperatura (0-1)",
+      "description": "Etiqueta de ajuste de temperatura"
+    },
+    "save_settings": {
+      "message": "Guardar configuración",
+      "description": "Texto del botón para guardar la configuración"
+    },
+    "enter_message": {
+      "message": "Escribe un mensaje...",
+      "description": "Marcador de posición del campo de entrada de mensaje"
+    },
+    "send": {
+      "message": "Enviar",
+      "description": "Texto del botón Enviar"
+    },
+    "settings_saved": {
+      "message": "Configuración guardada correctamente",
+      "description": "Notificación de configuración guardada"
+    },
+    "settings_save_failed": {
+      "message": "Error al guardar la configuración",
+      "description": "Notificación de fallo al guardar la configuración"
+    },
+    "api_key_required": {
+      "message": "Primero configura la clave de API en la configuración",
+      "description": "Mensaje de error: se requiere clave de API"
+    },
+    "api_error": {
+      "message": "Lo sentimos, ocurrió un error: ",
+      "description": "Prefijo del mensaje de error de la API"
+    },
+    "new_chat": {
+      "message": "Nuevo chat",
+      "description": "Título del botón de nuevo chat"
+    },
+    "clear_conversation": {
+      "message": "Borrar conversación",
+      "description": "Título del botón para borrar la conversación"
+    },
+    "clear_confirm_message": {
+      "message": "¿Estás seguro de que quieres borrar todos los mensajes?",
+      "description": "Mensaje de confirmación para borrar"
+    },
+    "new_chat_confirm_message": {
+      "message": "¿Iniciar una nueva conversación? La conversación actual se guardará.",
+      "description": "Mensaje de confirmación para nuevo chat"
+    },
+    "cancel": {
+      "message": "Cancelar",
+      "description": "Texto del botón Cancelar"
+    },
+    "clear": {
+      "message": "Borrar",
+      "description": "Texto del botón Borrar"
+    },
+    "delete": {
+      "message": "Eliminar",
+      "description": "Texto del botón Eliminar"
+    },
+    "conversation_cleared": {
+      "message": "Conversación borrada",
+      "description": "Notificación de conversación borrada"
+    },
+    "new_chat_created": {
+      "message": "Nuevo chat creado",
+      "description": "Notificación de nuevo chat creado"
+    },
+    "conversation_deleted": {
+      "message": "Conversación eliminada",
+      "description": "Notificación de conversación eliminada"
+    },
+    "chat_history": {
+      "message": "Historial de chats",
+      "description": "Título del panel de historial de chats"
+    },
+    "no_history": {
+      "message": "No hay historial de conversaciones",
+      "description": "Mensaje cuando no hay historial"
+    },
+    "drop_files_here": {
+      "message": "Suelta archivos aquí o haz clic para cargar",
+      "description": "Texto del área de arrastrar y soltar archivos"
+    },
+    "attached_files": {
+      "message": "Archivos adjuntos",
+      "description": "Título de la sección de archivos adjuntos"
+    },
+    "file_too_large": {
+      "message": "El archivo es demasiado grande (máx. 10 MB)",
+      "description": "Mensaje de error: archivo demasiado grande"
+    },
+    "attach_file": {
+      "message": "Adjuntar archivo",
+      "description": "Título del botón para adjuntar archivo"
+    },
+    "get_page_content": {
+      "message": "Obtener contenido de la página actual",
+      "description": "Título del botón para obtener contenido de la página"
+    },
+    "web_ref_notification": {
+      "message": "Contenido web referenciado. Usa @títulodelapágina para hacer referencia al contenido.",
+      "description": "Notificación cuando se referencia contenido web"
+    },
+    "web_ref_label": {
+      "message": "Referencia web",
+      "description": "Etiqueta de la sección de referencia web"
+    },
+    "web_ref_url": {
+      "message": "URL",
+      "description": "Etiqueta de URL en la referencia web"
+    },
+    "web_ref_summary": {
+      "message": "Resumen del contenido",
+      "description": "Etiqueta del resumen del contenido en la referencia web"
+    }
+  }

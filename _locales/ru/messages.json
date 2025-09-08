@@ -12,7 +12,7 @@
       "description": "Заголовок кнопки действия"
     },
     "ai_chat": {
-      "message": "Боковая панель ИИ",
+      "message": "Sidebar AI",
       "description": "Заголовок вверху"
     },
     "settings": {

@@ -12,7 +12,7 @@
       "description": "アクションボタンのタイトル"
     },
     "ai_chat": {
-      "message": "サイドバーAI",
+      "message": "Sidebar AI",
       "description": "ヘッダーのタイトル"
     },
     "settings": {
