@@ -1,0 +1,166 @@
+{
+    "extension_name": {
+      "message": "Боковая панель ИИ",
+      "description": "Название расширения"
+    },
+    "extension_description": {
+      "message": "Общайтесь с ИИ в боковой панели",
+      "description": "Описание расширения"
+    },
+    "open_ai_chat": {
+      "message": "Открыть чат с ИИ",
+      "description": "Заголовок кнопки действия"
+    },
+    "ai_chat": {
+      "message": "Боковая панель ИИ",
+      "description": "Заголовок вверху"
+    },
+    "settings": {
+      "message": "Настройки",
+      "description": "Заголовок панели настроек"
+    },
+    "api_endpoint": {
+      "message": "Конечная точка API",
+      "description": "Метка конечной точки API"
+    },
+    "api_key": {
+      "message": "Ключ API",
+      "description": "Метка ключа API"
+    },
+    "api_type": {
+      "message": "Тип API",
+      "description": "Метка выбора типа API"
+    },
+    "model": {
+      "message": "Модель",
+      "description": "Метка выбора модели"
+    },
+    "system_prompt": {
+      "message": "Системный запрос",
+      "description": "Метка текстового поля системного запроса в настройках"
+    },
+    "system_prompt_placeholder": {
+      "message": "Введите системный запрос для ИИ",
+      "description": "Текст-подсказка для поля системного запроса"
+    },
+    "show_token_info": {
+      "message": "Показать токены",
+      "description": "Показать информацию о токенах"
+    },
+    "temperature": {
+      "message": "Температура (0–1)",
+      "description": "Метка настройки температуры"
+    },
+    "save_settings": {
+      "message": "Сохранить настройки",
+      "description": "Текст кнопки сохранения настроек"
+    },
+    "enter_message": {
+      "message": "Введите сообщение...",
+      "description": "Подсказка в поле ввода сообщения"
+    },
+    "send": {
+      "message": "Отправить",
+      "description": "Текст кнопки отправки"
+    },
+    "settings_saved": {
+      "message": "Настройки успешно сохранены",
+      "description": "Уведомление об успешном сохранении"
+    },
+    "settings_save_failed": {
+      "message": "Не удалось сохранить настройки",
+      "description": "Уведомление о неудачном сохранении"
+    },
+    "api_key_required": {
+      "message": "Сначала настройте ключ API в параметрах",
+      "description": "Ошибка: требуется ключ API"
+    },
+    "api_error": {
+      "message": "Извините, произошла ошибка: ",
+      "description": "Префикс сообщения об ошибке API"
+    },
+    "new_chat": {
+      "message": "Новый чат",
+      "description": "Заголовок кнопки нового чата"
+    },
+    "clear_conversation": {
+      "message": "Очистить диалог",
+      "description": "Заголовок кнопки очистки диалога"
+    },
+    "clear_confirm_message": {
+      "message": "Вы уверены, что хотите удалить все сообщения?",
+      "description": "Сообщение подтверждения очистки"
+    },
+    "new_chat_confirm_message": {
+      "message": "Начать новый диалог? Текущий диалог будет сохранён.",
+      "description": "Сообщение подтверждения нового чата"
+    },
+    "cancel": {
+      "message": "Отмена",
+      "description": "Текст кнопки отмены"
+    },
+    "clear": {
+      "message": "Очистить",
+      "description": "Текст кнопки очистки"
+    },
+    "delete": {
+      "message": "Удалить",
+      "description": "Текст кнопки удаления"
+    },
+    "conversation_cleared": {
+      "message": "Диалог очищен",
+      "description": "Уведомление об очистке диалога"
+    },
+    "new_chat_created": {
+      "message": "Создан новый чат",
+      "description": "Уведомление о создании нового чата"
+    },
+    "conversation_deleted": {
+      "message": "Диалог удалён",
+      "description": "Уведомление об удалении диалога"
+    },
+    "chat_history": {
+      "message": "История чатов",
+      "description": "Заголовок панели истории чатов"
+    },
+    "no_history": {
+      "message": "Нет истории диалогов",
+      "description": "Сообщение об отсутствии истории"
+    },
+    "drop_files_here": {
+      "message": "Перетащите файлы сюда или щёлкните для загрузки",
+      "description": "Текст области загрузки файлов"
+    },
+    "attached_files": {
+      "message": "Прикреплённые файлы",
+      "description": "Заголовок раздела прикреплённых файлов"
+    },
+    "file_too_large": {
+      "message": "Файл слишком большой (макс. 10 МБ)",
+      "description": "Ошибка: файл превышает размер"
+    },
+    "attach_file": {
+      "message": "Прикрепить файл",
+      "description": "Заголовок кнопки прикрепления файла"
+    },
+    "get_page_content": {
+      "message": "Получить содержимое текущей страницы",
+      "description": "Заголовок кнопки получения содержимого страницы"
+    },
+    "web_ref_notification": {
+      "message": "Содержимое веб-страницы добавлено. Используйте @названиестраницы для ссылки на контент.",
+      "description": "Уведомление о добавлении веб-контента"
+    },
+    "web_ref_label": {
+      "message": "Веб-ссылка",
+      "description": "Метка раздела веб-ссылки"
+    },
+    "web_ref_url": {
+      "message": "URL",
+      "description": "Метка URL в веб-ссылке"
+    },
+    "web_ref_summary": {
+      "message": "Краткое содержание",
+      "description": "Метка краткого содержания в веб-ссылке"
+    }
+  }
