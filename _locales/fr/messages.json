@@ -1,0 +1,166 @@
+{
+    "extension_name": {
+      "message": "Sidebar IA",
+      "description": "Nom de l'extension"
+    },
+    "extension_description": {
+      "message": "Discutez avec l'IA dans la barre latérale",
+      "description": "Description de l'extension"
+    },
+    "open_ai_chat": {
+      "message": "Ouvrir le chat IA",
+      "description": "Titre du bouton d'action"
+    },
+    "ai_chat": {
+      "message": "Sidebar IA",
+      "description": "Titre de l'en-tête"
+    },
+    "settings": {
+      "message": "Paramètres",
+      "description": "Titre du panneau des paramètres"
+    },
+    "api_endpoint": {
+      "message": "Point de terminaison API",
+      "description": "Étiquette du point de terminaison API"
+    },
+    "api_key": {
+      "message": "Clé API",
+      "description": "Étiquette de la clé API"
+    },
+    "api_type": {
+      "message": "Type d'API",
+      "description": "Étiquette de sélection du type d'API"
+    },
+    "model": {
+      "message": "Modèle",
+      "description": "Étiquette de sélection du modèle"
+    },
+    "system_prompt": {
+      "message": "Invite système",
+      "description": "Étiquette pour la zone de texte de l'invite système dans les paramètres"
+    },
+    "system_prompt_placeholder": {
+      "message": "Saisissez l'invite système pour l'IA",
+      "description": "Texte indicatif pour la zone de texte de l'invite système"
+    },
+    "show_token_info": {
+      "message": "Afficher les jetons",
+      "description": "Afficher les jetons"
+    },
+    "temperature": {
+      "message": "Température (0-1)",
+      "description": "Étiquette du réglage de température"
+    },
+    "save_settings": {
+      "message": "Enregistrer les paramètres",
+      "description": "Texte du bouton d'enregistrement des paramètres"
+    },
+    "enter_message": {
+      "message": "Saisissez un message...",
+      "description": "Texte indicatif du champ de saisie du message"
+    },
+    "send": {
+      "message": "Envoyer",
+      "description": "Texte du bouton Envoyer"
+    },
+    "settings_saved": {
+      "message": "Paramètres enregistrés avec succès",
+      "description": "Notification d'enregistrement réussi des paramètres"
+    },
+    "settings_save_failed": {
+      "message": "Échec de l'enregistrement des paramètres",
+      "description": "Notification d'échec d'enregistrement des paramètres"
+    },
+    "api_key_required": {
+      "message": "Veuillez d'abord configurer la clé API dans les paramètres",
+      "description": "Message d'erreur : clé API requise"
+    },
+    "api_error": {
+      "message": "Désolé, une erreur s'est produite : ",
+      "description": "Préfixe du message d'erreur API"
+    },
+    "new_chat": {
+      "message": "Nouvelle conversation",
+      "description": "Titre du bouton Nouvelle conversation"
+    },
+    "clear_conversation": {
+      "message": "Effacer la conversation",
+      "description": "Titre du bouton Effacer la conversation"
+    },
+    "clear_confirm_message": {
+      "message": "Êtes-vous sûr de vouloir effacer tous les messages ?",
+      "description": "Message de confirmation d'effacement"
+    },
+    "new_chat_confirm_message": {
+      "message": "Démarrer une nouvelle conversation ? La conversation actuelle sera enregistrée.",
+      "description": "Message de confirmation de nouvelle conversation"
+    },
+    "cancel": {
+      "message": "Annuler",
+      "description": "Texte du bouton Annuler"
+    },
+    "clear": {
+      "message": "Effacer",
+      "description": "Texte du bouton Effacer"
+    },
+    "delete": {
+      "message": "Supprimer",
+      "description": "Texte du bouton Supprimer"
+    },
+    "conversation_cleared": {
+      "message": "Conversation effacée",
+      "description": "Notification d'effacement de la conversation"
+    },
+    "new_chat_created": {
+      "message": "Nouvelle conversation créée",
+      "description": "Notification de création d'une nouvelle conversation"
+    },
+    "conversation_deleted": {
+      "message": "Conversation supprimée",
+      "description": "Notification de suppression de la conversation"
+    },
+    "chat_history": {
+      "message": "Historique des conversations",
+      "description": "Titre du panneau d'historique des conversations"
+    },
+    "no_history": {
+      "message": "Aucun historique de conversation",
+      "description": "Message indiquant l'absence d'historique"
+    },
+    "drop_files_here": {
+      "message": "Déposez les fichiers ici ou cliquez pour télécharger",
+      "description": "Texte de la zone de dépôt de fichiers"
+    },
+    "attached_files": {
+      "message": "Fichiers joints",
+      "description": "Titre de la section Fichiers joints"
+    },
+    "file_too_large": {
+      "message": "Le fichier est trop volumineux (maximum 10 Mo)",
+      "description": "Message d'erreur : fichier trop volumineux"
+    },
+    "attach_file": {
+      "message": "Joindre un fichier",
+      "description": "Titre du bouton Joindre un fichier"
+    },
+    "get_page_content": {
+      "message": "Obtenir le contenu de la page actuelle",
+      "description": "Titre du bouton Obtenir le contenu de la page"
+    },
+    "web_ref_notification": {
+      "message": "Contenu web référencé, utilisez @titredelapage pour faire référence au contenu",
+      "description": "Notification lorsque du contenu web est référencé"
+    },
+    "web_ref_label": {
+      "message": "Référence web",
+      "description": "Étiquette de la section Référence web"
+    },
+    "web_ref_url": {
+      "message": "URL",
+      "description": "Étiquette de l'URL dans la référence web"
+    },
+    "web_ref_summary": {
+      "message": "Résumé du contenu",
+      "description": "Étiquette du résumé du contenu dans la référence web"
+    }
+  }
