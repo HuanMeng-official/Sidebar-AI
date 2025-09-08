@@ -27,7 +27,7 @@ project/
 ### Core Functionality
 - **Sidebar Integration**: Native Chrome sidebar implementation using Manifest V3 Side Panel API
 - **AI Chat Interface**: Real-time conversational AI interactions with streaming responses
-- **Multi-language Support**: Full internationalization (i18n) with English, Chinese locales
+- **Multi-language Support**: Full internationalization (i18n) with English, Chinese, Spanish, French, Japanese locales
 - **Persistent Storage**: Conversation history management with local storage persistence
 
 ### API Configuration
