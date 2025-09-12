@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sidebar AI</title>
   <link rel="stylesheet" href="sidebar.css">
 </head>
+
 <body>
   <div class="container">
     <div class="header">
@@ -31,18 +33,14 @@
           </div>
         </div>
       </div>
-      
+
       <div class="input-controls">
         <button id="attachBtn" class="attach-btn" title="Attach File">📎</button>
         <button id="getPageContentBtn" class="page-content-btn" title="Get Current Page Content">🌐</button>
-        <textarea 
-          id="messageInput" 
-          placeholder="Enter message..." 
-          class="message-input"
-        ></textarea>
+        <textarea id="messageInput" placeholder="Enter message..." class="message-input"></textarea>
         <button id="sendBtn" class="send-btn">Send</button>
       </div>
-      
+
       <div id="filePreviewContainer" class="file-preview-container hidden">
         <div class="file-preview-header">
           <span id="filePreviewTitle">Attached Files</span>
@@ -51,9 +49,9 @@
         <div id="filePreviewList" class="file-preview-list"></div>
       </div>
     </div>
-    
+
     <input type="file" id="fileInput" class="hidden" multiple accept="image/*">
-    
+
     <div id="settingsPanel" class="settings-panel hidden">
       <div class="settings-header">
         <h2 id="settingsTitle">Settings</h2>
@@ -69,7 +67,8 @@
         </div>
         <div class="setting-item">
           <label for="apiEndpoint" id="apiEndpointLabel">API Endpoint</label>
-          <input type="text" id="apiEndpoint" placeholder="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent">
+          <input type="text" id="apiEndpoint"
+            placeholder="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent">
         </div>
         <div class="setting-item">
           <label for="apiKey" id="apiKeyLabel">API Key</label>
@@ -98,7 +97,7 @@
         <button id="saveSettingsBtn" class="save-btn">Save Settings</button>
       </div>
     </div>
-    
+
     <div id="newChatDialog" class="confirm-dialog hidden">
       <div class="confirm-content">
         <h3 id="newChatTitle">New Chat</h3>
@@ -132,4 +131,5 @@
   </div>
   <script src="sidebar.js"></script>
 </body>
+
 </html>

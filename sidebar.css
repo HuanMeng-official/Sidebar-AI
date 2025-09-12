@@ -192,10 +192,10 @@ body {
 .chat-container {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   background-color: var(--ios-background);
   scroll-behavior: smooth;
 }
@@ -243,7 +243,7 @@ body {
 }
 
 .message-content {
-  padding: 12px 16px;
+  padding: 8px 16px;
   border-radius: var(--ios-border-radius);
   font-size: 15px;
   line-height: 1.5;
@@ -268,8 +268,8 @@ body {
 
 /* 文件预览样式 */
 .message-files {
-  margin-bottom: 8px;
-  padding-bottom: 8px;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
   border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -312,8 +312,8 @@ body {
 .token-info {
   font-size: 12px;
   color: var(--ios-secondary-label);
-  margin-top: 8px;
-  padding-top: 4px;
+  margin-top: 4px;
+  padding-top: 2px;
   border-top: 0.5px solid rgba(0, 0, 0, 0.1);
   font-style: italic;
   text-align: left;
@@ -326,7 +326,7 @@ body {
 .message-content h4,
 .message-content h5,
 .message-content h6 {
-  margin: 12px 0 8px 0;
+  margin: 8px 0 4px 0;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -361,7 +361,7 @@ body {
 }
 
 .message-content p {
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 .message-content strong {
@@ -403,13 +403,13 @@ body {
 
 .message-content ul,
 .message-content ol {
-  margin: 8px 0;
-  padding-left: 20px;
+  margin: 4px 0;
+  padding-left: 16px;
 }
 
 .message-content li {
-  margin: 4px 0;
-  line-height: 1.5;
+  margin: 2px 0;
+  line-height: 1.4;
 }
 
 .message-content ul li {
@@ -433,13 +433,13 @@ body {
 .message-content hr {
   border: none;
   border-top: 1px solid var(--ios-system-gray4);
-  margin: 16px 0;
+  margin: 8px 0;
 }
 
 .message-content blockquote {
   border-left: 3px solid var(--ios-system-blue);
-  margin: 8px 0;
-  padding-left: 12px;
+  margin: 4px 0;
+  padding-left: 10px;
   color: var(--ios-secondary-label);
 }
 
@@ -485,7 +485,7 @@ body {
 .typing-indicator .message-content {
   background-color: var(--ios-secondary-background);
   border: 0.5px solid var(--ios-system-gray5);
-  padding: 10px 14px;
+  padding: 8px 14px;
 }
 
 /* 流式消息样式 */
@@ -1417,7 +1417,7 @@ input:checked+.ios-toggle-slider:before {
   }
 
   .message-content {
-    padding: 10px 14px;
+    padding: 8px 14px;
     font-size: 14px;
   }
 

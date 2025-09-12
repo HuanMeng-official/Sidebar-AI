@@ -376,26 +376,26 @@ class AIChatSidebar {
 
   processWebReferences(message) {
     const webRefs = [];
-    
+
     // 检查消息中是否包含 @标题 引用
     const webRefRegex = /@([^\s@]+)/g;
     let match;
-    
+
     while ((match = webRefRegex.exec(message)) !== null) {
       const refTitle = match[1];
-      
+
       // 在存储的网页引用中查找匹配的标题
       if (this.webReferences) {
-        const matchedRef = this.webReferences.find(ref => 
+        const matchedRef = this.webReferences.find(ref =>
           ref.title.includes(refTitle) || refTitle.includes(ref.title)
         );
-        
+
         if (matchedRef) {
           webRefs.push(matchedRef);
         }
       }
     }
-    
+
     return webRefs;
   }
 
@@ -472,7 +472,7 @@ class AIChatSidebar {
 
     // 处理 @网页 引用
     const webReferences = this.processWebReferences(message);
-    
+
     this.addMessage(message, 'user', this.attachedFiles, webReferences);
 
     this.messageInput.value = '';
@@ -547,7 +547,7 @@ class AIChatSidebar {
     if (webReferences && webReferences.length > 0) {
       const webRefsDiv = document.createElement('div');
       webRefsDiv.className = 'web-references';
-      
+
       webReferences.forEach(ref => {
         const refDiv = document.createElement('div');
         refDiv.className = 'web-reference';
@@ -560,7 +560,7 @@ class AIChatSidebar {
         `;
         webRefsDiv.appendChild(refDiv);
       });
-      
+
       contentDiv.appendChild(webRefsDiv);
     }
 
@@ -599,64 +599,22 @@ class AIChatSidebar {
 
 
   renderMarkdown(text) {
-    let html = this.escapeHtml(text);
-    html = this.renderTables(html);
-    html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-    html = html.replace(/^(\s*)-\s+(.*)$/gm, '$1<li>$2</li>');
-    html = html.replace(/(<li>.*<\/li>)+/gs, '<ul>$&</ul>');
-    html = html.replace(/^(\s*)\d+\.\s+(.*)$/gm, '$1<li>$2</li>');
-    html = html.replace(/(<li>.*<\/li>)+/gs, '<ol>$&</ol>');
-    html = html.replace(/^###### (.*$)/gm, '<h6>$1</h6>');
-    html = html.replace(/^##### (.*$)/gm, '<h5>$1</h5>');
-    html = html.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
-    html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
-    html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
-    html = html.replace(/^---$/gm, '<hr>');
-    html = html.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
-    html = html.replace(/\n/g, '<br>');
-    return html;
-  }
-
-  renderTables(html) {
-    const tableRegex = /(\|(?:[^\n]*\|)+\n\|(?:\s*[-:]+\s*\|)+\n(?:\|(?:[^\n]*\|)+\n?)*)/g;
-
-    return html.replace(tableRegex, (match) => {
-      const lines = match.trim().split('\n');
-      if (lines.length < 2) return match;
-
-      const headerLine = lines[0];
-      const separatorLine = lines[1];
-      const headers = headerLine.split('|').filter(cell => cell.trim() !== '');
-      const separators = separatorLine.split('|').filter(cell => cell.trim() !== '');
-
-      if (headers.length !== separators.length) return match;
-
-      let tableHtml = '<table class="markdown-table">';
-      tableHtml += '<thead><tr>';
-      headers.forEach(header => {
-        tableHtml += `<th>${this.escapeHtml(header.trim())}</th>`;
-      });
-      tableHtml += '</tr></thead>';
-      tableHtml += '<tbody>';
-      for (let i = 2; i < lines.length; i++) {
-        const rowLine = lines[i];
-        const cells = rowLine.split('|').filter(cell => cell.trim() !== '');
-        if (cells.length === headers.length) {
-          tableHtml += '<tr>';
-          cells.forEach(cell => {
-            tableHtml += `<td>${this.escapeHtml(cell.trim())}</td>`;
-          });
-          tableHtml += '</tr>';
-        }
+    try {
+      // 检查 marked 是否已加载
+      if (typeof marked === 'undefined') {
+        console.warn('Marked library not available, using fallback rendering');
+        return this.escapeHtml(text);
       }
-      tableHtml += '</tbody></table>';
-      return tableHtml;
-    });
+      
+      return marked.parse(text, {
+        breaks: true,
+        gfm: true,
+        headerIds: false
+      });
+    } catch (error) {
+      console.error('Markdown parsing error:', error);
+      return this.escapeHtml(text);
+    }
   }
 
   async getAIResponse(userMessage, webReferences = []) {
@@ -731,11 +689,11 @@ class AIChatSidebar {
       if (webReferences.length > 0) {
         const webRefParts = [];
         webReferences.forEach(ref => {
-          webRefParts.push({ 
+          webRefParts.push({
             text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 500)}...`
           });
         });
-        
+
         if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
           contents[contents.length - 1].parts.push(...webRefParts);
         } else {
@@ -856,11 +814,11 @@ class AIChatSidebar {
       if (webReferences.length > 0) {
         const webRefParts = [];
         webReferences.forEach(ref => {
-          webRefParts.push({ 
+          webRefParts.push({
             text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 500)}...`
           });
         });
-        
+
         if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
           contents[contents.length - 1].parts.push(...webRefParts);
         } else {
@@ -880,7 +838,7 @@ class AIChatSidebar {
       };
 
       const model = this.settings.model || 'gemini-2.5-flash';
-      
+
       // 为 Gemini 使用 streamGenerateContent 方法
       const modelName = model.includes('/') ? model : `models/${model}`;
       const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:streamGenerateContent?key=${this.settings.apiKey}&alt=sse`;
@@ -901,21 +859,21 @@ class AIChatSidebar {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Gemini API Error Response:', response.status, response.statusText, errorText);
-        
+
         // 退回非流式传输
-        const modelSupportsStreaming = this.settings.model && 
+        const modelSupportsStreaming = this.settings.model &&
           (this.settings.model.includes('gemini') || this.settings.model.includes('1.5') || this.settings.model.includes('2.0') || this.settings.model.includes('2.5'));
-        
+
         if (response.status === 404 || response.status === 400 || response.status === 403 || !modelSupportsStreaming) {
           console.log('Streaming not supported for this model, falling back to non-streaming Gemini API');
           try {
             const result = await this.callGeminiAPI(userMessage, webReferences);
             const endTime = performance.now();
-            const tokens = { 
-              ...result.tokens, 
-              timeTakenMs: endTime - startTime 
+            const tokens = {
+              ...result.tokens,
+              timeTakenMs: endTime - startTime
             };
-            
+
             this.removeTypingIndicator();
             this.addMessageToUI(result.text, 'ai', [], true, tokens);
             this.clearAttachedFiles();
@@ -925,7 +883,7 @@ class AIChatSidebar {
             throw new Error(`Gemini API Error: ${response.status} ${response.statusText} - Fallback also failed`);
           }
         }
-        
+
         throw new Error(`Gemini API Error: ${response.status} ${response.statusText}`);
       }
 
@@ -941,14 +899,14 @@ class AIChatSidebar {
       aiMessageDiv = document.createElement('div');
       aiMessageDiv.className = 'message ai-message streaming-message';
       aiMessageDiv.dataset.sender = 'ai';
-      
+
       aiMessageContentDiv = document.createElement('div');
       aiMessageContentDiv.className = 'message-content';
-      
+
       const textDiv = document.createElement('div');
       textDiv.className = 'message-text';
       aiMessageContentDiv.appendChild(textDiv);
-      
+
       aiMessageDiv.appendChild(aiMessageContentDiv);
       this.chatContainer.appendChild(aiMessageDiv);
       this.scrollToBottom();
@@ -958,7 +916,7 @@ class AIChatSidebar {
         console.warn('Stream timeout - no data received for 30 seconds');
         reader.cancel();
       }, 30000);
-      
+
       try {
         while (true) {
           const { done, value } = await reader.read();
@@ -979,12 +937,12 @@ class AIChatSidebar {
 
           const chunk = decoder.decode(value, { stream: true });
           console.log('Raw chunk received:', chunk);
-          
+
           const lines = chunk.split('\n').filter(line => line.trim());
 
           for (const line of lines) {
             console.log('Processing line:', line);
-            
+
             if (line.startsWith('data: ')) {
               const data = line.slice(6);
               if (data === '[DONE]') {
@@ -992,83 +950,83 @@ class AIChatSidebar {
                 break;
               }
 
-            try {
-              const parsed = JSON.parse(data);
-              console.log('Gemini streaming chunk raw:', data);
-              console.log('Gemini streaming chunk parsed:', parsed);
-              
-              // 处理 Gemini 流式响应格式，检查多种可能的结构
-              let textChunk = '';
-              
-              // 标准候选格式
-              if (parsed.candidates && parsed.candidates[0]) {
-                const candidate = parsed.candidates[0];
-                
-                if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
-                  const part = candidate.content.parts[0];
-                  if (part.text) {
-                    textChunk = part.text;
+              try {
+                const parsed = JSON.parse(data);
+                console.log('Gemini streaming chunk raw:', data);
+                console.log('Gemini streaming chunk parsed:', parsed);
+
+                // 处理 Gemini 流式响应格式，检查多种可能的结构
+                let textChunk = '';
+
+                // 标准候选格式
+                if (parsed.candidates && parsed.candidates[0]) {
+                  const candidate = parsed.candidates[0];
+
+                  if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+                    const part = candidate.content.parts[0];
+                    if (part.text) {
+                      textChunk = part.text;
+                    }
+                  }
+
+                  // 处理结束原因
+                  if (candidate.finishReason && candidate.finishReason !== 'FINISH_REASON_UNSPECIFIED') {
+                    console.log('Stream finished with reason:', candidate.finishReason);
+                    break;
                   }
                 }
-                
-                // 处理结束原因
-                if (candidate.finishReason && candidate.finishReason !== 'FINISH_REASON_UNSPECIFIED') {
-                  console.log('Stream finished with reason:', candidate.finishReason);
+
+                // 响应中直接包含文本
+                if (!textChunk && parsed.text) {
+                  textChunk = parsed.text;
+                }
+
+                // 错误响应
+                if (parsed.error) {
+                  console.error('Gemini API error:', parsed.error);
                   break;
                 }
-              }
-              
-              // 响应中直接包含文本
-              if (!textChunk && parsed.text) {
-                textChunk = parsed.text;
-              }
-              
-              // 错误响应
-              if (parsed.error) {
-                console.error('Gemini API error:', parsed.error);
-                break;
-              }
-              
-              // 元数据使用量
-              if (parsed.usageMetadata) {
-                console.log('Usage metadata:', parsed.usageMetadata);
-                // TODO: 令牌计数
-              }
-              
-              if (textChunk) {
-                hasContent = true;
-                fullResponse += textChunk;
-                textDiv.innerHTML = this.renderMarkdown(fullResponse);
-                this.scrollToBottom();
-                
-                // 估算令牌数（4个字符为1个 Token）
-                outputTokens += Math.ceil(textChunk.length / 4);
-                
-                console.log('Received text chunk:', textChunk);
-              } else if (Object.keys(parsed).length > 0) {
-                console.log('Received non-text chunk:', parsed);
-              }
-            } catch (e) {
-              console.log('Error parsing Gemini streaming chunk:', e, data);
-              // 尝试处理格式错误的 JSON
-              if (data.includes('text') || data.includes('content')) {
-                console.log('Attempting to extract text from malformed JSON:', data);
-                // 从格式错误的 JSON 中提取简单文本
-                const textMatch = data.match(/"text"\s*:\s*"([^"]*)"/);
-                if (textMatch && textMatch[1]) {
-                  const extractedText = textMatch[1];
+
+                // 元数据使用量
+                if (parsed.usageMetadata) {
+                  console.log('Usage metadata:', parsed.usageMetadata);
+                  // TODO: 令牌计数
+                }
+
+                if (textChunk) {
                   hasContent = true;
-                  fullResponse += extractedText;
+                  fullResponse += textChunk;
                   textDiv.innerHTML = this.renderMarkdown(fullResponse);
                   this.scrollToBottom();
-                  outputTokens += Math.ceil(extractedText.length / 4);
-                  console.log('Extracted text from malformed JSON:', extractedText);
+
+                  // 估算令牌数（4个字符为1个 Token）
+                  outputTokens += Math.ceil(textChunk.length / 4);
+
+                  console.log('Received text chunk:', textChunk);
+                } else if (Object.keys(parsed).length > 0) {
+                  console.log('Received non-text chunk:', parsed);
+                }
+              } catch (e) {
+                console.log('Error parsing Gemini streaming chunk:', e, data);
+                // 尝试处理格式错误的 JSON
+                if (data.includes('text') || data.includes('content')) {
+                  console.log('Attempting to extract text from malformed JSON:', data);
+                  // 从格式错误的 JSON 中提取简单文本
+                  const textMatch = data.match(/"text"\s*:\s*"([^"]*)"/);
+                  if (textMatch && textMatch[1]) {
+                    const extractedText = textMatch[1];
+                    hasContent = true;
+                    fullResponse += extractedText;
+                    textDiv.innerHTML = this.renderMarkdown(fullResponse);
+                    this.scrollToBottom();
+                    outputTokens += Math.ceil(extractedText.length / 4);
+                    console.log('Extracted text from malformed JSON:', extractedText);
+                  }
                 }
               }
             }
           }
         }
-      }
       } catch (streamError) {
         console.error('Stream reading error:', streamError);
         if (streamError.name === 'AbortError') {
@@ -1087,7 +1045,7 @@ class AIChatSidebar {
 
       // 使用最终内容和令牌数更新消息
       aiMessageDiv.classList.remove('streaming-message');
-      
+
       // 如果在流式传输过程中未接收到任何内容，则回退到非流式传输
       if (!hasContent || fullResponse.trim() === '') {
         console.log('No content received from streaming, falling back to non-streaming API');
@@ -1095,12 +1053,12 @@ class AIChatSidebar {
         const result = await this.callGeminiAPI(userMessage, webReferences);
         tokens.inputTokens = result.tokens.inputTokens;
         tokens.outputTokens = result.tokens.outputTokens;
-        
+
         this.addMessageToUI(result.text, 'ai', [], true, tokens);
         this.clearAttachedFiles();
         return;
       }
-      
+
       // 添加到对话历史
       const messageItem = {
         content: fullResponse.trim(),
@@ -1115,7 +1073,7 @@ class AIChatSidebar {
       if (this.settings.showTokenInfo) {
         const tokenInfoDiv = document.createElement('div');
         tokenInfoDiv.className = 'token-info';
-        
+
         let tokenText = '';
         if (tokens.outputTokens !== undefined) {
           tokenText += `Out: ${tokens.outputTokens} tokens`;
@@ -1338,7 +1296,7 @@ class AIChatSidebar {
       webReferences.forEach(ref => {
         webRefContent += `\n---\n${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 300)}...\n---\n`;
       });
-      
+
       if (messages.length > 0 && messages[messages.length - 1].role === 'user') {
         messages[messages.length - 1].content += webRefContent;
       } else {
@@ -1383,14 +1341,14 @@ class AIChatSidebar {
       aiMessageDiv = document.createElement('div');
       aiMessageDiv.className = 'message ai-message streaming-message';
       aiMessageDiv.dataset.sender = 'ai';
-      
+
       aiMessageContentDiv = document.createElement('div');
       aiMessageContentDiv.className = 'message-content';
-      
+
       const textDiv = document.createElement('div');
       textDiv.className = 'message-text';
       aiMessageContentDiv.appendChild(textDiv);
-      
+
       aiMessageDiv.appendChild(aiMessageContentDiv);
       this.chatContainer.appendChild(aiMessageDiv);
       this.scrollToBottom();
@@ -1436,7 +1394,7 @@ class AIChatSidebar {
 
       // 使用最终内容和令牌数更新消息
       aiMessageDiv.classList.remove('streaming-message');
-      
+
       // 添加到对话历史
       const messageItem = {
         content: fullResponse,
@@ -1451,7 +1409,7 @@ class AIChatSidebar {
       if (this.settings.showTokenInfo) {
         const tokenInfoDiv = document.createElement('div');
         tokenInfoDiv.className = 'token-info';
-        
+
         let tokenText = '';
         if (tokens.outputTokens !== undefined) {
           tokenText += `Out: ${tokens.outputTokens} tokens`;
@@ -1772,6 +1730,44 @@ class AIChatSidebar {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  new AIChatSidebar();
+async function loadMarked() {
+  return new Promise((resolve) => {
+    const markedUrl = chrome.runtime.getURL('lib/marked.min.js');
+    console.log('Attempting to load marked from:', markedUrl);
+    
+    // 使用标准的 script 标签加载方式
+    const script = document.createElement('script');
+    script.src = markedUrl;
+    script.onload = () => {
+      console.log('Marked library loaded successfully');
+      console.log('Marked available:', typeof marked !== 'undefined');
+      resolve(true);
+    };
+    script.onerror = (error) => {
+      console.error('Failed to load marked library:', error);
+      console.log('Error details:', error);
+      resolve(false);
+    };
+    
+    document.head.appendChild(script);
+    
+    // 添加超时检查
+    setTimeout(() => {
+      if (typeof marked === 'undefined') {
+        console.warn('Marked library loading timeout');
+        resolve(false);
+      }
+    }, 3000);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const markedLoaded = await loadMarked();
+  if (markedLoaded) {
+    new AIChatSidebar();
+  } else {
+    console.error('Marked library failed to load, sidebar functionality may be limited');
+    // 即使 marked 加载失败，也创建侧边栏实例
+    new AIChatSidebar();
+  }
 });
