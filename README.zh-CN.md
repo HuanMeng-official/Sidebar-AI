@@ -2,7 +2,7 @@
 
 > 一个 Chrome Manifest V3 扩展，在浏览器侧边栏提供 AI 聊天界面，支持可自定义的 API 端点、模型和 APPLE UI 设计。
 
-[English Version](README.md) | [中文版本](README.zh-CN.md)
+[English Version](README.md) | [中文版本](README.zh-CN.md) | [Versión en Español](README.es.md) | [Version Française](README.fr.md) | [日本語版](README.ja.md) | [русский язык](README.ru.md)
 
 ## 功能特性
 
@@ -99,8 +99,12 @@
 ## 本地化支持
 
 ### 支持的语言
-- **英语 (en)**: 主要语言，完整功能覆盖
-- **简体中文 (zh_CN)**: 完整的普通话本地化
+- 英文
+- 中文
+- 西班牙文
+- 法文
+- 日文
+- 俄文
 
 ### 翻译框架
 - **消息包**: 基于 JSON 的 i18n 消息目录
