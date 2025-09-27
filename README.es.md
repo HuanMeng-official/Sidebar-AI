@@ -122,7 +122,7 @@ project/
 ### Requisitos del Sistema
 - **Sistemas Operativos**: Windows 10+, macOS 10.15+, distribuciones Linux con GTK
 - **Memoria**: Mínimo 4GB RAM recomendado para rendimiento óptimo
-- **Almacenamiento**: 50MB de espacio en disco disponible para extensión y datos en caché
+- **Almacenamiento**: 50KB de espacio en disco disponible para extensión y datos en caché
 
 ## Privacidad y Manejo de Datos
 

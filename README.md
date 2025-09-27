@@ -122,7 +122,7 @@ project/
 ### System Requirements
 - **Operating Systems**: Windows 10+, macOS 10.15+, Linux distributions with GTK
 - **Memory**: Minimum 4GB RAM recommended for optimal performance
-- **Storage**: 50MB available disk space for extension and cached data
+- **Storage**: 50KB available disk space for extension and cached data
 
 ## Privacy & Data Handling
 

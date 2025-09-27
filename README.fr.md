@@ -122,7 +122,7 @@ project/
 ### Exigences Système
 - **Systèmes d'Exploitation**: Windows 10+, macOS 10.15+, distributions Linux avec GTK
 - **Mémoire**: Minimum 4GB RAM recommandé pour des performances optimales
-- **Stockage**: 50MB d'espace disque disponible pour l'extension et les données en cache
+- **Stockage**: 50KB d'espace disque disponible pour l'extension et les données en cache
 
 ## Confidentialité et Gestion des Données
 
