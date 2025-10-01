@@ -57,7 +57,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 mainContent = contentTexts.join('\n\n');
             }
 
-            const maxContentLength = 5000;
+            const maxContentLength = 10000;
             if (mainContent.length > maxContentLength) {
                 mainContent = mainContent.substring(0, maxContentLength) + `... (Content truncated. Total extracted length was approximately ${mainContent.length} characters.)`;
             }

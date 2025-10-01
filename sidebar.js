@@ -690,7 +690,7 @@ class AIChatSidebar {
         const webRefParts = [];
         webReferences.forEach(ref => {
           webRefParts.push({
-            text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 500)}...`
+            text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 5000)}...`
           });
         });
 
@@ -815,7 +815,7 @@ class AIChatSidebar {
         const webRefParts = [];
         webReferences.forEach(ref => {
           webRefParts.push({
-            text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 500)}...`
+            text: `[${chrome.i18n.getMessage('web_ref_label')}: ${ref.title}]\n${chrome.i18n.getMessage('web_ref_url')}: ${ref.url}\n${chrome.i18n.getMessage('web_ref_summary')}: ${ref.content.substring(0, 5000)}...`
           });
         });
 
