@@ -136,7 +136,7 @@
     "description": "附加文件区域标题"
   },
   "file_too_large": {
-    "message": "文件过大（最大10MB）",
+    "message": "文件过大（最大50MB）",
     "description": "文件过大错误消息"
   },
   "attach_file": {

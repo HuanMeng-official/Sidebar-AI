@@ -136,7 +136,7 @@
       "description": "Título de la sección de archivos adjuntos"
     },
     "file_too_large": {
-      "message": "El archivo es demasiado grande (máx. 10 MB)",
+      "message": "El archivo es demasiado grande (máx. 50 MB)",
       "description": "Mensaje de error: archivo demasiado grande"
     },
     "attach_file": {

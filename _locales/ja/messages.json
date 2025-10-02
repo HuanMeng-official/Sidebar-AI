@@ -136,7 +136,7 @@
       "description": "添付ファイルセクションのタイトル"
     },
     "file_too_large": {
-      "message": "ファイルが大きすぎます（最大10MB）",
+      "message": "ファイルが大きすぎます（最大50MB）",
       "description": "ファイルサイズ超過エラーメッセージ"
     },
     "attach_file": {

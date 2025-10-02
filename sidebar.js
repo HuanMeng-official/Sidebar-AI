@@ -16,9 +16,9 @@ class AIChatSidebar {
     this.conversationHistory = [];
     this.maxHistoryLength = 50;
     this.attachedFiles = [];
-    this.maxFileSize = 10 * 1024 * 1024;
-    this.allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-    this.allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'];
+    this.maxFileSize = 50 * 1024 * 1024; // 50MB for video/audio files
+    this.allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'video/mp4', 'video/mpeg', 'video/ogg', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/aac', 'audio/flac'];
+    this.allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg', '.mp4', '.mpeg', '.mpg', '.ogg', '.webm', '.mov', '.qt', '.mp3', '.wav', '.aac', '.flac'];
     this.isFetchingPageContent = false;
 
     this.initializeElements();
@@ -518,6 +518,10 @@ class AIChatSidebar {
         let icon = '📄';
         if (file.type.startsWith('image/')) {
           icon = '🖼️';
+        } else if (file.type.startsWith('video/')) {
+          icon = '🎬';
+        } else if (file.type.startsWith('audio/')) {
+          icon = '🎵';
         }
 
         const fileSize = this.formatFileSize(file.size);
@@ -1141,7 +1145,7 @@ class AIChatSidebar {
       }
 
       for (const file of this.attachedFiles) {
-        if (file.type.startsWith('image/')) {
+        if (file.type.startsWith('image/') || file.type.startsWith('video/') || file.type.startsWith('audio/')) {
           try {
             const base64DataUrl = await this.fileToBase64(file);
             contentParts.push({
@@ -1151,13 +1155,13 @@ class AIChatSidebar {
               }
             });
           } catch (error) {
-            console.error('Error processing image file for OpenAI:', file.name, error);
-            contentParts.push({ type: 'text', text: `[Error reading image: ${file.name}]` });
+            console.error('Error processing image/video/audio file for OpenAI:', file.name, error);
+            contentParts.push({ type: 'text', text: `[Error reading file: ${file.name}]` });
           }
         } else {
           contentParts.push({
             type: 'text',
-            text: `Attached file (not an image): ${file.name} (${this.formatFileSize(file.size)})`
+            text: `Attached file (not an image/video/audio): ${file.name} (${this.formatFileSize(file.size)})`
           });
         }
       }
@@ -1255,7 +1259,7 @@ class AIChatSidebar {
       }
 
       for (const file of this.attachedFiles) {
-        if (file.type.startsWith('image/')) {
+        if (file.type.startsWith('image/') || file.type.startsWith('video/') || file.type.startsWith('audio/')) {
           try {
             const base64DataUrl = await this.fileToBase64(file);
             contentParts.push({
@@ -1265,13 +1269,13 @@ class AIChatSidebar {
               }
             });
           } catch (error) {
-            console.error('Error processing image file for OpenAI:', file.name, error);
-            contentParts.push({ type: 'text', text: `[Error reading image: ${file.name}]` });
+            console.error('Error processing image/video/audio file for OpenAI:', file.name, error);
+            contentParts.push({ type: 'text', text: `[Error reading file: ${file.name}]` });
           }
         } else {
           contentParts.push({
             type: 'text',
-            text: `Attached file (not an image): ${file.name} (${this.formatFileSize(file.size)})`
+            text: `Attached file (not an image/video/audio): ${file.name} (${this.formatFileSize(file.size)})`
           });
         }
       }
@@ -1443,7 +1447,7 @@ class AIChatSidebar {
 
     for (const file of files) {
       try {
-        if (file.type.startsWith('image/')) {
+        if (file.type.startsWith('image/') || file.type.startsWith('video/') || file.type.startsWith('audio/')) {
           const base64DataUrl = await this.fileToBase64(file);
           fileParts.push({
             inlineData: {
@@ -1531,12 +1535,12 @@ class AIChatSidebar {
       const isAllowedExtension = this.allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
 
       if (!isAllowedType && !isAllowedExtension) {
-        this.showNotification(`File ${file.name} is not an allowed image type.`, 'error');
+        this.showNotification(`File ${file.name} is not an allowed file type.`, 'error');
         return;
       }
 
       if (file.size > this.maxFileSize) {
-        this.showNotification(`File ${file.name} is too large (max 10MB)`, 'error');
+        this.showNotification(`File ${file.name} is too large (max 50MB)`, 'error');
         return;
       }
 
@@ -1575,6 +1579,10 @@ class AIChatSidebar {
       let icon = '📄';
       if (file.type.startsWith('image/')) {
         icon = '🖼️';
+      } else if (file.type.startsWith('video/')) {
+        icon = '🎬';
+      } else if (file.type.startsWith('audio/')) {
+        icon = '🎵';
       }
 
       const fileSize = this.formatFileSize(file.size);

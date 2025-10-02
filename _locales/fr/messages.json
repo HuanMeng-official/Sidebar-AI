@@ -136,7 +136,7 @@
       "description": "Titre de la section Fichiers joints"
     },
     "file_too_large": {
-      "message": "Le fichier est trop volumineux (maximum 10 Mo)",
+      "message": "Le fichier est trop volumineux (maximum 50 Mo)",
       "description": "Message d'erreur : fichier trop volumineux"
     },
     "attach_file": {

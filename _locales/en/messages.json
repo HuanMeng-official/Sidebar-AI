@@ -136,7 +136,7 @@
     "description": "Attached files section title"
   },
   "file_too_large": {
-    "message": "File is too large (max 10MB)",
+    "message": "File is too large (max 50MB)",
     "description": "File too large error message"
   },
   "attach_file": {
