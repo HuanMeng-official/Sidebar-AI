@@ -26,6 +26,14 @@ class AIChatSidebar {
     this.loadSettings();
     this.loadConversationHistory();
     this.bindEvents();
+
+    // 检查URL参数，如果包含showSettings=true则自动打开设置
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('showSettings') === 'true') {
+      setTimeout(() => {
+        this.openSettings();
+      }, 100);
+    }
   }
 
   initializeElements() {
@@ -64,6 +72,9 @@ class AIChatSidebar {
     this.getPageContentBtn = document.getElementById('getPageContentBtn');
     this.systemPromptInput = document.getElementById('systemPrompt');
     this.showTokenInfoInput = document.getElementById('showTokenInfo');
+
+    // 浮动窗口元素
+    this.floatingCloseBtn = document.getElementById('floatingCloseBtn');
   }
 
   translateUI() {
@@ -137,6 +148,11 @@ class AIChatSidebar {
     this.closeHistoryBtn.addEventListener('click', () => this.closeHistory());
     this.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
 
+    // 浮动窗口关闭按钮
+    if (this.floatingCloseBtn) {
+      this.floatingCloseBtn.addEventListener('click', () => this.closeFloatingWindow());
+    }
+
     if (this.apiTypeSelect) {
       this.apiTypeSelect.addEventListener('change', () => this.updateApiDefaults());
     }
@@ -204,6 +220,13 @@ class AIChatSidebar {
     if (this.getPageContentBtn) {
       this.getPageContentBtn.addEventListener('click', () => this.fetchAndSendMessage());
     }
+
+    // 监听来自background的消息
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.action === 'showSettings') {
+        this.openSettings();
+      }
+    });
   }
 
   updateApiDefaults() {
@@ -317,6 +340,26 @@ class AIChatSidebar {
 
   closeHistory() {
     this.historyPanel.classList.add('hidden');
+  }
+
+  closeFloatingWindow() {
+    // 尝试关闭当前窗口
+    if (chrome.windows && chrome.windows.getCurrent) {
+      chrome.windows.getCurrent((window) => {
+        if (window && window.type === 'popup') {
+          chrome.windows.remove(window.id);
+        } else {
+          // 如果不是popup窗口，则尝试关闭标签页
+          if (chrome.tabs && chrome.tabs.getCurrent) {
+            chrome.tabs.getCurrent((tab) => {
+              if (tab) {
+                chrome.tabs.remove(tab.id);
+              }
+            });
+          }
+        }
+      });
+    }
   }
 
   renderHistoryList() {

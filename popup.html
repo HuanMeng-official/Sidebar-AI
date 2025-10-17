@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat</title>
+    <style>
+        body {
+            width: 300px;
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin: 0;
+            color: #1d1d1f;
+        }
+
+        .button {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            background: #007aff;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .button:hover {
+            background: #0056cc;
+            transform: translateY(-1px);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-button {
+            background: #8e8e93;
+        }
+
+        .secondary-button:hover {
+            background: #6d6d70;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #8e8e93;
+            text-align: center;
+            margin: 0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1c1c1e;
+                color: #ffffff;
+            }
+
+            .header h1 {
+                color: #ffffff;
+            }
+
+            .info-text {
+                color: #98989d;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Chat</h1>
+        </div>
+
+        <button class="button" id="openChat">
+            💬 打开聊天窗口
+        </button>
+
+        <button class="button secondary-button" id="openSettings">
+            ⚙️ 设置
+        </button>
+
+        <p class="info-text">
+            点击"打开聊天窗口"将在浮动窗口中启动AI对话
+        </p>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

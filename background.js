@@ -1,15 +1,31 @@
 chrome.runtime.onInstalled.addListener(() => {
+  console.log('AI Chat Extension installed/updated');
 });
 
-chrome.action.onClicked.addListener((tab) => {
-  chrome.sidePanel.open({ windowId: tab.windowId });
-});
-
-chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
-
+// 处理来自popup的消息
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("Background received message:", request);
 
+  if (request.action === 'toggleChat') {
+    // 使用content script在当前页面中切换聊天界面
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleChat' }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('Error sending message to content script:', chrome.runtime.lastError);
+            sendResponse({ success: false, error: chrome.runtime.lastError.message });
+          } else {
+            sendResponse(response);
+          }
+        });
+      } else {
+        sendResponse({ success: false, error: 'No active tab found' });
+      }
+    });
+    return true;
+  }
+
+  // 原有的getPageContent功能保持不变
   if (request.action === "getPageContent") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (chrome.runtime.lastError) {
@@ -114,5 +130,72 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 });
+
+// 打开浮动窗口函数
+function openFloatingWindow(showSettings = false) {
+  // 如果浮动窗口已经存在，则聚焦它
+  if (floatingWindowId) {
+    chrome.windows.get(floatingWindowId, (window) => {
+      if (chrome.runtime.lastError) {
+        // 窗口不存在，重新创建
+        createFloatingWindow(showSettings);
+      } else {
+        // 窗口存在，聚焦它
+        chrome.windows.update(floatingWindowId, { focused: true });
+        // 如果需要显示设置，发送消息给窗口
+        if (showSettings) {
+          chrome.tabs.query({ windowId: floatingWindowId }, (tabs) => {
+            if (tabs && tabs[0]) {
+              chrome.tabs.sendMessage(tabs[0].id, {
+                action: 'showSettings',
+                showSettings: true
+              });
+            }
+          });
+        }
+      }
+    });
+  } else {
+    createFloatingWindow(showSettings);
+  }
+}
+
+// 创建浮动窗口
+function createFloatingWindow(showSettings = false) {
+  const width = 400;
+  const height = 600;
+
+  // 获取屏幕尺寸来计算居中位置
+  chrome.windows.getCurrent((currentWindow) => {
+    let left = Math.round((currentWindow.width - width) / 2);
+    let top = Math.round((currentWindow.height - height) / 2);
+
+    // 确保窗口在屏幕范围内
+    left = Math.max(0, left);
+    top = Math.max(0, top);
+
+    chrome.windows.create({
+      url: chrome.runtime.getURL('sidebar.html') + (showSettings ? '?showSettings=true' : ''),
+      type: 'popup',
+      width: width,
+      height: height,
+      left: left,
+      top: top
+    }, (window) => {
+      if (window) {
+        floatingWindowId = window.id;
+        console.log('Floating window created with ID:', floatingWindowId);
+
+        // 监听窗口关闭事件
+        chrome.windows.onRemoved.addListener((removedWindowId) => {
+          if (removedWindowId === floatingWindowId) {
+            floatingWindowId = null;
+            console.log('Floating window closed');
+          }
+        });
+      }
+    });
+  });
+}
 
 console.log("Background script loaded.");

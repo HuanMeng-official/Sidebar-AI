@@ -1716,3 +1716,115 @@ input:checked+.ios-toggle-slider:before {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* 浮动窗口专用样式 */
+.floating-window {
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  position: relative;
+}
+
+.floating-window .container {
+  border-radius: 20px;
+}
+
+.floating-window .header {
+  border-radius: 20px 20px 0 0;
+  cursor: move;
+  user-select: none;
+}
+
+.floating-window .input-container {
+  border-radius: 0 0 20px 20px;
+}
+
+/* 移动端触摸优化 */
+@media (pointer: coarse) {
+  .history-btn,
+  .new-chat-btn,
+  .clear-btn,
+  .settings-btn,
+  .attach-btn,
+  .page-content-btn,
+  .send-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .message-input {
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  .message-input.multiline {
+    min-height: 44px;
+    line-height: 1.4;
+  }
+
+  .header {
+    padding: 16px;
+  }
+
+  .input-container {
+    padding: 16px;
+  }
+
+  .chat-container {
+    padding: 16px;
+  }
+}
+
+/* 浮动窗口关闭按钮 */
+.floating-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--ios-system-gray);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  z-index: 101;
+}
+
+.floating-close-btn:hover {
+  background-color: var(--ios-system-gray5);
+  transform: scale(1.05);
+}
+
+.floating-close-btn:active {
+  background-color: var(--ios-system-gray4);
+  transform: scale(0.95);
+}
+
+/* Android Edge 特定优化 */
+@media (max-width: 768px) {
+  .floating-window {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .floating-window .container {
+    border-radius: 0;
+  }
+
+  .floating-window .header {
+    border-radius: 0;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .floating-window .input-container {
+    border-radius: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
