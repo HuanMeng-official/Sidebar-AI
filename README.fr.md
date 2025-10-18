@@ -27,7 +27,7 @@ project/
 ### Fonctionnalités Principales
 - **Intégration de Barre Latérale**: Implémentation native de barre latérale Chrome utilisant l'API Side Panel de Manifest V3
 - **Interface de Chat IA**: Interactions conversationnelles IA en temps réel avec réponses en streaming
-- **Support Multilingue**: Internationalisation complète (i18n) avec localisations en anglais, chinois, espagnol, français, japonais
+- **Support Multilingue**: Internationalisation complète (i18n) avec localisations en anglais, chinois, espagnol, français, japonais, russe
 - **Stockage Persistant**: Gestion de l'historique des conversations avec persistance dans le stockage local
 
 ### Configuration d'API
