@@ -1,3 +1,111 @@
+class SecureApiKeyStorage {
+  constructor() {
+    this.keyName = 'encrypted_api_key';
+    this.cryptoKeyName = 'crypto_key_jwk';
+    this.algorithm = { name: 'AES-GCM', length: 256 };
+    this.cryptoKey = null;
+  }
+
+  async init() {
+    try {
+      // 生成或获取加密密钥
+      this.cryptoKey = await this.getCryptoKey();
+      if (!this.cryptoKey) {
+        this.cryptoKey = await this.generateCryptoKey();
+      }
+      return true;
+    } catch (error) {
+      console.error('Secure storage initialization failed:', error);
+      return false;
+    }
+  }
+
+  async generateCryptoKey() {
+    const key = await crypto.subtle.generateKey(
+      { name: 'AES-GCM', length: 256 },
+      true, // extractable
+      ['encrypt', 'decrypt']
+    );
+
+    // 导出并存储密钥
+    const exported = await crypto.subtle.exportKey('jwk', key);
+    await chrome.storage.local.set({ [this.cryptoKeyName]: exported });
+    return key;
+  }
+
+  async getCryptoKey() {
+    const result = await chrome.storage.local.get([this.cryptoKeyName]);
+    if (result[this.cryptoKeyName]) {
+      return await crypto.subtle.importKey(
+        'jwk',
+        result[this.cryptoKeyName],
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+    }
+    return null;
+  }
+
+  async encryptApiKey(apiKey) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(apiKey);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      this.cryptoKey,
+      data
+    );
+
+    return {
+      iv: Array.from(iv),
+      data: Array.from(new Uint8Array(encrypted))
+    };
+  }
+
+  async decryptApiKey(encryptedData) {
+    const iv = new Uint8Array(encryptedData.iv);
+    const data = new Uint8Array(encryptedData.data);
+
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      this.cryptoKey,
+      data
+    );
+
+    return new TextDecoder().decode(decrypted);
+  }
+
+  async saveApiKey(apiKey) {
+    if (!this.cryptoKey) {
+      throw new Error('Secure storage not initialized');
+    }
+    const encrypted = await this.encryptApiKey(apiKey);
+    await chrome.storage.local.set({ [this.keyName]: encrypted });
+  }
+
+  async getApiKey() {
+    if (!this.cryptoKey) {
+      return null;
+    }
+    const result = await chrome.storage.local.get([this.keyName]);
+    if (result[this.keyName]) {
+      return await this.decryptApiKey(result[this.keyName]);
+    }
+    return null;
+  }
+
+  async clearApiKey() {
+    await chrome.storage.local.remove([this.keyName]);
+  }
+
+  async hasApiKey() {
+    const result = await chrome.storage.local.get([this.keyName]);
+    return !!result[this.keyName];
+  }
+}
+
 class AIChatSidebar {
   constructor() {
     this.defaultSettings = {
@@ -16,16 +124,67 @@ class AIChatSidebar {
     this.conversationHistory = [];
     this.maxHistoryLength = 50;
     this.attachedFiles = [];
-    this.maxFileSize = 50 * 1024 * 1024; // 50MB for video/audio files
+    this.maxFileSize = 50 * 1024 * 1024;
     this.allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'video/mp4', 'video/mpeg', 'video/ogg', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/aac', 'audio/flac'];
     this.allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg', '.mp4', '.mpeg', '.mpg', '.ogg', '.webm', '.mov', '.qt', '.mp3', '.wav', '.aac', '.flac'];
     this.isFetchingPageContent = false;
 
+    // 安全存储
+    this.secureStorage = new SecureApiKeyStorage();
+    this.useSecureStorage = false;
+    this.apiKeyConfigured = false;
+
     this.initializeElements();
     this.translateUI();
+    this.initializeSecureStorage();
     this.loadSettings();
     this.loadConversationHistory();
     this.bindEvents();
+  }
+
+  async initializeSecureStorage() {
+    try {
+      this.useSecureStorage = await this.secureStorage.init();
+      if (this.useSecureStorage) {
+        console.log('Secure storage initialized successfully');
+        this.apiKeyConfigured = await this.secureStorage.hasApiKey();
+      } else {
+        console.warn('Secure storage initialization failed, using basic storage');
+        // 检查是否有旧的明文密钥
+        const oldSettings = await chrome.storage.sync.get(['aiChatSettings']);
+        if (oldSettings.aiChatSettings && oldSettings.aiChatSettings.apiKey) {
+          this.apiKeyConfigured = true;
+        }
+      }
+      this.updateApiKeyStatusUI();
+    } catch (error) {
+      console.error('Secure storage initialization error:', error);
+      this.useSecureStorage = false;
+    }
+  }
+
+  updateApiKeyStatusUI() {
+    // 在设置面板中添加密钥状态显示
+    let statusElement = document.getElementById('apiKeyStatus');
+    if (!statusElement) {
+      statusElement = document.createElement('div');
+      statusElement.id = 'apiKeyStatus';
+      statusElement.className = 'api-key-status';
+
+      // 插入到API密钥输入框后面
+      const apiKeyInput = document.getElementById('apiKey');
+      if (apiKeyInput && apiKeyInput.parentNode) {
+        apiKeyInput.parentNode.appendChild(statusElement);
+      }
+    }
+
+    if (this.apiKeyConfigured) {
+      statusElement.textContent = '🔐 API Key Configured (Securely Stored)';
+      statusElement.className = 'api-key-status configured';
+    } else {
+      statusElement.textContent = '⚠️ API Key Required';
+      statusElement.className = 'api-key-status required';
+    }
   }
 
   initializeElements() {
@@ -282,9 +441,31 @@ class AIChatSidebar {
   }
 
   async saveSettings() {
+    const apiKey = this.apiKeyInput.value.trim();
+    let shouldSaveApiKeyInSettings = false;
+
+    if (apiKey) {
+      if (this.useSecureStorage) {
+        try {
+          await this.secureStorage.saveApiKey(apiKey);
+          this.apiKeyConfigured = true;
+          console.log('API key securely stored');
+        } catch (error) {
+          console.error('Failed to securely store API key:', error);
+          this.showNotification('Failed to securely store API key', 'error');
+          return;
+        }
+      } else {
+        // 回退到基本存储
+        console.warn('Using basic storage for API key');
+        shouldSaveApiKeyInSettings = true;
+      }
+    }
+
+    // 保存其他设置
     this.settings = {
       apiEndpoint: this.apiEndpointInput.value.trim() || this.defaultSettings.apiEndpoint,
-      apiKey: this.apiKeyInput.value.trim(),
+      apiKey: shouldSaveApiKeyInSettings ? apiKey : '', // 仅在安全存储不可用时存储明文密钥
       model: this.modelInput.value.trim() || this.defaultSettings.model,
       temperature: parseFloat(this.temperatureInput.value),
       apiType: this.apiTypeSelect ? this.apiTypeSelect.value : 'gemini',
@@ -294,7 +475,12 @@ class AIChatSidebar {
 
     try {
       await chrome.storage.sync.set({ aiChatSettings: this.settings });
+
+      // 清空输入框中的密钥
+      this.apiKeyInput.value = '';
+
       this.closeSettings();
+      this.updateApiKeyStatusUI();
       this.showNotification(chrome.i18n.getMessage('settings_saved'));
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -304,6 +490,7 @@ class AIChatSidebar {
 
   openSettings() {
     this.settingsPanel.classList.remove('hidden');
+    this.updateApiKeyStatusUI();
   }
 
   closeSettings() {
@@ -644,7 +831,16 @@ class AIChatSidebar {
   }
 
   async callGeminiAPI(message, webReferences = []) {
-    if (!this.settings.apiKey) {
+    // 安全获取API密钥
+    let apiKey;
+    if (this.useSecureStorage) {
+      apiKey = await this.secureStorage.getApiKey();
+    } else {
+      // 回退到旧的存储方式
+      apiKey = this.settings.apiKey;
+    }
+
+    if (!apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
 
@@ -717,7 +913,7 @@ class AIChatSidebar {
       };
 
       const model = this.settings.model || 'gemini-2.5-flash';
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.settings.apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
       console.log('Gemini API Request:', url, requestBody);
 
@@ -769,7 +965,16 @@ class AIChatSidebar {
   }
 
   async callGeminiAPIStreaming(userMessage, startTime, webReferences = []) {
-    if (!this.settings.apiKey) {
+    // 安全获取API密钥
+    let apiKey;
+    if (this.useSecureStorage) {
+      apiKey = await this.secureStorage.getApiKey();
+    } else {
+      // 回退到旧的存储方式
+      apiKey = this.settings.apiKey;
+    }
+
+    if (!apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
 
@@ -845,7 +1050,7 @@ class AIChatSidebar {
 
       // 为 Gemini 使用 streamGenerateContent 方法
       const modelName = model.includes('/') ? model : `models/${model}`;
-      const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:streamGenerateContent?key=${this.settings.apiKey}&alt=sse`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:streamGenerateContent?key=${apiKey}&alt=sse`;
 
       console.log('Gemini Streaming API Request:', url, requestBody);
 
@@ -1106,7 +1311,16 @@ class AIChatSidebar {
   }
 
   async callOpenAIAPI(message) {
-    if (!this.settings.apiKey) {
+    // 安全获取API密钥
+    let apiKey;
+    if (this.useSecureStorage) {
+      apiKey = await this.secureStorage.getApiKey();
+    } else {
+      // 回退到旧的存储方式
+      apiKey = this.settings.apiKey;
+    }
+
+    if (!apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
 
@@ -1184,7 +1398,7 @@ class AIChatSidebar {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.settings.apiKey}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: this.settings.model,
@@ -1220,7 +1434,16 @@ class AIChatSidebar {
   }
 
   async callOpenAIAPIStreaming(userMessage, startTime, webReferences = []) {
-    if (!this.settings.apiKey) {
+    // 安全获取API密钥
+    let apiKey;
+    if (this.useSecureStorage) {
+      apiKey = await this.secureStorage.getApiKey();
+    } else {
+      // 回退到旧的存储方式
+      apiKey = this.settings.apiKey;
+    }
+
+    if (!apiKey) {
       throw new Error(chrome.i18n.getMessage('api_key_required'));
     }
 
@@ -1316,7 +1539,7 @@ class AIChatSidebar {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.settings.apiKey}`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: this.settings.model,
@@ -1740,7 +1963,7 @@ class AIChatSidebar {
 
 async function loadMarked() {
   return new Promise((resolve) => {
-    const markedUrl = chrome.runtime.getURL('lib/marked.min.js');
+    const markedUrl = chrome.runtime.getURL('lib/marked.umd.js');
     console.log('Attempting to load marked from:', markedUrl);
     
     // 使用标准的 script 标签加载方式
