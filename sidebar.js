@@ -179,10 +179,10 @@ class AIChatSidebar {
     }
 
     if (this.apiKeyConfigured) {
-      statusElement.textContent = '🔐 API Key Configured (Securely Stored)';
+      statusElement.textContent = chrome.i18n.getMessage('apikey_configured');
       statusElement.className = 'api-key-status configured';
     } else {
-      statusElement.textContent = '⚠️ API Key Required';
+      statusElement.textContent = chrome.i18n.getMessage('apikey_required');
       statusElement.className = 'api-key-status required';
     }
   }

@@ -162,5 +162,13 @@
     "web_ref_summary": {
       "message": "Краткое содержание",
       "description": "Метка краткого содержания в веб-ссылке"
+    },
+    "apikey_configured": {
+      "message": "🔐 API-ключ настроен (надёжно сохранён)",
+      "description": "Сообщение о том, что API-ключ настроен"
+    },
+    "apikey_required": {
+      "message": "⚠️ Требуется API-ключ",
+      "description": "Сообщение об отсутствии API-ключа"
     }
   }

@@ -162,5 +162,13 @@
   "web_ref_summary": {
     "message": "內容摘要",
     "description": "網頁引用中的內容摘要標籤"
+  },
+  "apikey_configured": {
+    "message": "🔐 API 金鑰已設定（安全儲存）",
+    "description": "API 金鑰已設定的訊息"
+  },
+  "apikey_required": {
+    "message": "⚠️ 需要 API 金鑰",
+    "description": "缺少 API 金鑰的訊息"
   }
 }

@@ -162,5 +162,13 @@
   "web_ref_summary": {
     "message": "Content Summary",
     "description": "Label for content summary in web reference"
+  },
+  "apikey_configured": {
+    "message": "🔐 API Key Configured (Securely Stored)",
+    "description": "API Key configured message"
+  },
+  "apikey_required": {
+    "message": "⚠️ API Key Required",
+    "description": "Missing apikey message"
   }
 }

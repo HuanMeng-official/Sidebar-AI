@@ -162,5 +162,13 @@
     "web_ref_summary": {
       "message": "Résumé du contenu",
       "description": "Étiquette du résumé du contenu dans la référence web"
+    },
+    "apikey_configured": {
+      "message": "🔐 Clé API configurée (stockée de manière sécurisée)",
+      "description": "Message indiquant que la clé API est configurée"
+    },
+    "apikey_required": {
+      "message": "⚠️ Clé API requise",
+      "description": "Message indiquant qu'une clé API est manquante"
     }
   }

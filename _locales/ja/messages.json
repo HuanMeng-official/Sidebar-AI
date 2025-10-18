@@ -162,5 +162,13 @@
     "web_ref_summary": {
       "message": "内容の要約",
       "description": "ウェブ参照内の内容要約ラベル"
+    },
+    "apikey_configured": {
+      "message": "🔐 APIキーが設定されました（安全に保存済み）",
+      "description": "APIキーが設定されたことを示すメッセージ"
+    },
+    "apikey_required": {
+      "message": "⚠️ APIキーが必要です",
+      "description": "APIキーが不足していることを示すメッセージ"
     }
   }

@@ -162,5 +162,13 @@
   "web_ref_summary": {
     "message": "内容摘要",
     "description": "网页引用中的内容摘要标签"
+  },
+  "apikey_configured": {
+    "message": "🔐 API 密钥已配置（安全存储）",
+    "description": "API 密钥已配置的消息"
+  },
+  "apikey_required": {
+    "message": "⚠️ 需要 API 密钥",
+    "description": "缺少 API 密钥的消息"
   }
 }
